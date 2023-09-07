@@ -1,10 +1,4 @@
-SLUG = "Aepelzens Parasites"
-VERSION = 0.6.0dev
-
-FLAGS += \
-	-DTEST -DPARASITES \
-	-I./parasites \
-	-Wno-unused-local-typedefs
+FLAGS += -I./parasites -Wno-unused-local-typedefs
 
 SOURCES += $(wildcard src/*.cpp)
 SOURCES += parasites/stmlib/utils/random.cc
