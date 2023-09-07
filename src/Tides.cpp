@@ -54,8 +54,7 @@ struct Tides : Module {
 	SchmittTrigger rangeTrigger;
 
 	Tides();
-	void step() override;
-
+	void process(const ProcessArgs& args) override;
 
 	void reset() override {
 		generator.set_range(tides::GENERATOR_RANGE_MEDIUM);
@@ -68,41 +67,32 @@ struct Tides : Module {
 		generator.set_mode((tides::GeneratorMode) (randomu32() % 3));
 	}
 
-	json_t *dataToJson() override {
-		json_t *rootJ = json_object();
-
-		json_object_set_new(rootJ, "mode", json_integer((int) generator.mode()));
-		json_object_set_new(rootJ, "range", json_integer((int) generator.range()));
+	json_t* dataToJson() override {
+		json_t* rootJ = json_object();
+		json_object_set_new(rootJ, "mode", json_integer(static_cast<int>(generator.mode())));
+		json_object_set_new(rootJ, "range", json_integer(static_cast<int>(generator.range())));
 		json_object_set_new(rootJ, "sheep", json_boolean(sheep));
-		json_object_set_new(rootJ, "featureMode", json_integer((int)generator.feature_mode_));
+		json_object_set_new(rootJ, "featureMode", json_integer(static_cast<int>(generator.feature_mode_)));
 		json_object_set_new(rootJ, "QuantizerMode", json_integer(quantize));
-
 		return rootJ;
 	}
 
-	void dataFromJson(json_t *rootJ) override {
-		json_t *featModeJ = json_object_get(rootJ, "featureMode");
-		if(featModeJ)
+	void dataFromJson(json_t* rootJ) override {
+		if(json_t* featModeJ = json_object_get(rootJ, "featureMode")) {
 		    generator.feature_mode_ = (tides::Generator::FeatureMode) json_integer_value(featModeJ);
-		json_t *modeJ = json_object_get(rootJ, "mode");
-		if (modeJ) {
+		}
+		if (json_t* modeJ = json_object_get(rootJ, "mode")) {
 			generator.set_mode((tides::GeneratorMode) json_integer_value(modeJ));
 		}
-
-		json_t *rangeJ = json_object_get(rootJ, "range");
-		if (rangeJ) {
+		if (json_t* rangeJ = json_object_get(rootJ, "range")) {
 			generator.set_range((tides::GeneratorRange) json_integer_value(rangeJ));
 		}
-
-		json_t *sheepJ = json_object_get(rootJ, "sheep");
-		if (sheepJ) {
+		if (json_t* sheepJ = json_object_get(rootJ, "sheep")) {
 			sheep = json_boolean_value(sheepJ);
 		}
-		json_t *quantizerJ = json_object_get(rootJ, "QuantizerMode");
-		if (quantizerJ) {
+		if (json_t* quantizerJ = json_object_get(rootJ, "QuantizerMode")) {
 			quantize = json_integer_value(quantizerJ);
 		}
-
 	}
 };
 
@@ -114,7 +104,7 @@ Tides::Tides() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 	reset();
 }
 
-void Tides::step() {
+void Tides::process(const ProcessArgs& args) {
 	tides::GeneratorMode mode = generator.mode();
 	if (modeTrigger.process(params[MODE_PARAM].value)) {
 		mode = (tides::GeneratorMode) (((int)mode - 1 + 3) % 3);
@@ -153,7 +143,7 @@ void Tides::step() {
 		}
 
 		// Scale to the global sample rate
-		pitch += log2f(48000.0 / engineGetSampleRate()) * 12.0 * 0x80;
+		pitch += log2f(48000.0 / args.sampleRate) * 12.0 * 0x80;
 
 		if (generator.feature_mode_ == tides::Generator::FEAT_MODE_HARMONIC) {
 		    generator.set_pitch_high_range(clamp(pitch, -0x8000, 0x7fff), fm);
@@ -228,8 +218,7 @@ void Tides::step() {
 
 
 struct TidesWidget : ModuleWidget {
-	Panel *tidesPanel;
-	TidesWidget(Tides *module);
+	TidesWidget(Tides* module);
 	Menu *createContextMenu() override;
 };
 
@@ -278,7 +267,7 @@ struct TidesSheepItem : MenuItem {
 	void onAction(EventAction &e) override {
 		tides->sheep ^= true;
 	}
-	void step() override {
+	void process(const ProcessArgs& args) override {
 		rightText = (tides->sheep) ? "✔" : "";
 		MenuItem::step();
 	}
@@ -290,7 +279,7 @@ struct TidesModeItem : MenuItem {
     	void onAction(EventAction &e) override {
 	    module->generator.feature_mode_ = mode;
 	}
-	void step() override {
+	void process(const ProcessArgs& args) override {
 	  rightText = (module->generator.feature_mode_ == mode) ? "✔" : "";
 		MenuItem::step();
 	}
@@ -302,7 +291,7 @@ struct TidesQuantizerItem : MenuItem {
     	void onAction(EventAction &e) override {
 	    module->quantize = quantize_;
 	}
-	void step() override {
+	void process(const ProcessArgs& args) override {
 	  rightText = (module->quantize == quantize_) ? "✔" : "";
 	  MenuItem::step();
 	}

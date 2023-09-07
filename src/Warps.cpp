@@ -39,36 +39,34 @@ struct Warps : Module {
 	SchmittTrigger stateTrigger;
 
 	Warps();
-	void step() override;
+	void process(const ProcessArgs& args) override;
 
-	json_t *dataToJson() override {
-		json_t *rootJ = json_object();
-		warps::Parameters *p = modulator.mutable_parameters();
+	json_t* dataToJson() override {
+		json_t* rootJ = json_object();
+		warps::Parameters* p = modulator.mutable_parameters();
 		json_object_set_new(rootJ, "shape", json_integer(p->carrier_shape));
 		json_object_set_new(rootJ, "mode", json_integer(modulator.feature_mode()));
 		return rootJ;
 	}
 
-	void dataFromJson(json_t *rootJ) override {
-		json_t *shapeJ = json_object_get(rootJ, "shape");
-		warps::Parameters *p = modulator.mutable_parameters();
-		if (shapeJ) {
+	void dataFromJson(json_t* rootJ) override {
+		warps::Parameters* p = modulator.mutable_parameters();
+		if (json_t* shapeJ = json_object_get(rootJ, "shape")) {
 			p->carrier_shape = json_integer_value(shapeJ);
 		}
-		json_t *modeJ = json_object_get(rootJ, "mode");
-		if (modeJ) {
-		  modulator.set_feature_mode((warps::FeatureMode)json_integer_value(modeJ));
+		if (json_t *modeJ = json_object_get(rootJ, "mode")) {
+		  	modulator.set_feature_mode((warps::FeatureMode)json_integer_value(modeJ));
 		}
 	}
 
 	void reset() override {
-		warps::Parameters *p = modulator.mutable_parameters();
+		warps::Parameters* p = modulator.mutable_parameters();
 		p->carrier_shape = 0;
 		modulator.set_feature_mode(warps::FEATURE_MODE_META);
 	}
 
 	void randomize() override {
-		warps::Parameters *p = modulator.mutable_parameters();
+		warps::Parameters* p = modulator.mutable_parameters();
 		p->carrier_shape = randomu32() % 4;
 	}
 };
@@ -79,9 +77,9 @@ Warps::Warps() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 	modulator.Init(96000.0f);
 }
 
-void Warps::step() {
+void Warps::process(const ProcessArgs& args) {
 	// State trigger
-	warps::Parameters *p = modulator.mutable_parameters();
+	warps::Parameters* p = modulator.mutable_parameters();
 	if (stateTrigger.process(params[STATE_PARAM].value)) {
 		p->carrier_shape = (p->carrier_shape + 1) % 4;
 	}
@@ -121,7 +119,7 @@ void Warps::step() {
 		// p->frequency_shift_cv = clampf(inputs[ALGORITHM_INPUT].value / 5.0, -1.0, 1.0);
 		// p->phase_shift = p->modulation_algorithm;
 		p->note = 60.0 * params[LEVEL1_PARAM].value + 12.0 * inputs[LEVEL1_INPUT].normalize(2.0) + 12.0;
-		p->note += log2f(96000.0 / engineGetSampleRate()) * 12.0;
+		p->note += log2f(96000.0 / args.sampleRate) * 12.0;
 
 		modulator.Process(inputFrames, outputFrames, 60);
 	}
@@ -181,7 +179,7 @@ struct WarpsModeItem : MenuItem {
 	  //module->playback = playback;
 	  module->modulator.set_feature_mode(mode);
 	}
-	void step() override {
+	void process(const ProcessArgs& args) override {
 	  rightText = (module->modulator.feature_mode() == mode) ? "✔" : "";
 		MenuItem::step();
 	}

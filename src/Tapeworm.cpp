@@ -81,18 +81,17 @@ struct Tapeworm : Module {
 	DelayInterpolation delay_interpolation_;
 
 	Tapeworm();
-	void step() override;
+	void process(const ProcessArgs& args) override;
 	void ProcessDelay(warps::ShortFrame* input, warps::ShortFrame* output, size_t size);
 
-	json_t *dataToJson() override {
-		json_t *rootJ = json_object();
+	json_t* dataToJson() override {
+		json_t* rootJ = json_object();
 		json_object_set_new(rootJ, "shape", json_integer(parameters_.carrier_shape));
 		return rootJ;
 	}
 
 	void dataFromJson(json_t *rootJ) override {
-		json_t *shapeJ = json_object_get(rootJ, "shape");
-		if (shapeJ) {
+		if (json_t* shapeJ = json_object_get(rootJ, "shape")) {
 			parameters_.carrier_shape = json_integer_value(shapeJ);
 		}
 	}
@@ -334,7 +333,7 @@ void Tapeworm::ProcessDelay(warps::ShortFrame* input, warps::ShortFrame* output,
 }
 
 
-void Tapeworm::step() {
+void Tapeworm::process(const ProcessArgs& args) {
 	// State trigger
 	warps::Parameters *p = &parameters_;
 	if (stateTrigger.process(params[STATE_PARAM].value)) {
@@ -385,10 +384,10 @@ void Tapeworm::step() {
 
 
 struct TapewormWidget : ModuleWidget {
-	TapewormWidget(Tapeworm *module);
+	TapewormWidget(Tapeworm* module);
 };
 
-TapewormWidget::TapewormWidget(Tapeworm *module) {
+TapewormWidget::TapewormWidget(Tapeworm* module) {
 	setModule(module);
 	setPanel(createPanel(assetPlugin(pluginInstance, "res/Tapeworm.svg")));
 
