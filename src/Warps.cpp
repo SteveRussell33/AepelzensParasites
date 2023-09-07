@@ -214,4 +214,4 @@ Menu *WarpsWidget::createContextMenu() {
 	return menu;
 }
 
-Model *modelWarps = Model::create<Warps, WarpsWidget>("Aepelzens Parasites", "Warps", "Wasp", RING_MODULATOR_TAG, WAVESHAPER_TAG, EFFECT_TAG);
+Model *modelWarps = Model::create<Warps, WarpsWidget>("Warps");

@@ -423,4 +423,4 @@ TapewormWidget::TapewormWidget(Tapeworm *module) : ModuleWidget(module) {
 	addChild(ModuleLightWidget::create<AlgorithmLight>(Vec(40, 63), module, Tapeworm::ALGORITHM_LIGHT));
 }
 
-Model *modelTapeworm = Model::create<Tapeworm, TapewormWidget>("Aepelzens Parasites ZB", "Tapeworm", "Tapeworm", EFFECT_TAG, DELAY_TAG);
+Model *modelTapeworm = Model::create<Tapeworm, TapewormWidget>("Tapeworm");
