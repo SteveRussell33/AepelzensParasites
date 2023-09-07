@@ -1,7 +1,5 @@
 #include <string.h>
 #include "AepelzensParasites.hpp"
-#include "dsp/samplerate.hpp"
-#include "dsp/digital.hpp"
 #include "tides/generator.h"
 #include "tides/cv_scaler.h"
 
@@ -240,7 +238,7 @@ TidesWidget::TidesWidget(Tides *module) : ModuleWidget(module) {
 
 	{
 		tidesPanel = new LightPanel();
-		tidesPanel->backgroundImage = Image::load(assetPlugin(plugin, "res/Cycles.png"));
+		tidesPanel->backgroundImage = Image::load(assetPlugin(pluginInstance, "res/Cycles.png"));
 		tidesPanel->box.size = box.size;
 		addChild(tidesPanel);
 	}

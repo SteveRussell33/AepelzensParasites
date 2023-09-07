@@ -1,9 +1,7 @@
 #include <string.h>
 #include "AepelzensParasites.hpp"
-#include "dsp/digital.hpp"
 #include "warps/dsp/modulator.h"
 #include "warps/resources.h"
-
 
 struct Warps : Module {
 	enum ParamIds {
@@ -33,7 +31,6 @@ struct Warps : Module {
 		ALGORITHM_LIGHT,
 		NUM_LIGHTS = ALGORITHM_LIGHT + 3
 	};
-
 
 	int frame = 0;
 	warps::Modulator modulator;
@@ -146,7 +143,7 @@ WarpsWidget::WarpsWidget(Warps *module) : ModuleWidget(module) {
 
 	{
 		Panel *panel = new LightPanel();
-		panel->backgroundImage = Image::load(assetPlugin(plugin, "res/Wasp.png"));
+		panel->backgroundImage = Image::load(assetPlugin(pluginInstance, "res/Wasp.png"));
 		panel->box.size = box.size;
 		addChild(panel);
 	}
