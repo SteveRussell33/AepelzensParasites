@@ -39,11 +39,15 @@ struct Warps : Module {
 	dsp::SchmittTrigger stateTrigger;
 
 	Warps() {
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		configParam(Warps::ALGORITHM_PARAM, 0.0, 8.0, 0.0, "");
 		configParam(Warps::TIMBRE_PARAM, 0.0, 1.0, 0.5, "");
 		configParam(Warps::STATE_PARAM, 0.0, 1.0, 0.0, "");
 		configParam(Warps::LEVEL1_PARAM, 0.0, 1.0, 1.0, "");
 		configParam(Warps::LEVEL2_PARAM, 0.0, 1.0, 1.0, "");
+
+		memset(&modulator, 0, sizeof(modulator));
+		modulator.Init(96000.0f);
 	}
 	
 	void process(const ProcessArgs& args) override;
@@ -74,15 +78,9 @@ struct Warps : Module {
 
 	void onRandomize() override {
 		warps::Parameters* p = modulator.mutable_parameters();
-		p->carrier_shape = randomu32() % 4;
+		p->carrier_shape = random::u32() % 4;
 	}
 };
-
-
-Warps::Warps() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
-	memset(&modulator, 0, sizeof(modulator));
-	modulator.Init(96000.0f);
-}
 
 void Warps::process(const ProcessArgs& args) {
 	// State trigger
@@ -148,12 +146,12 @@ struct WarpsWidget : ModuleWidget {
 
 WarpsWidget::WarpsWidget(Warps *module) {
 	setModule(module);
-	setPanel(createPanel(assetPlugin(pluginInstance, "res/Wasp.svg")));
+	setPanel(APP->window->loadSvg(assetPlugin(pluginInstance, "res/Wasp.svg")));
 
-	addChild(Widget::create<ScrewSilver>(Vec(15, 0)));
-	addChild(Widget::create<ScrewSilver>(Vec(120, 0)));
-	addChild(Widget::create<ScrewSilver>(Vec(15, 365)));
-	addChild(Widget::create<ScrewSilver>(Vec(120, 365)));
+	addChild(createWidget<ScrewSilver>(Vec(15, 0)));
+	addChild(createWidget<ScrewSilver>(Vec(120, 0)));
+	addChild(createWidget<ScrewSilver>(Vec(15, 365)));
+	addChild(createWidget<ScrewSilver>(Vec(120, 365)));
 
 	addParam(createParam<Rogan6PSWhite>(Vec(29, 52), module, Warps::ALGORITHM_PARAM));
 
@@ -172,14 +170,16 @@ WarpsWidget::WarpsWidget(Warps *module) {
 	addOutput(createOutput<PJ301MPort>(Vec(80, 316), module, Warps::MODULATOR_OUTPUT));
 	addOutput(createOutput<PJ301MPort>(Vec(116, 316), module, Warps::AUX_OUTPUT));
 
-	addChild(ModuleLightWidget::create<SmallLight<GreenRedLight>>(Vec(20, 167), module, Warps::CARRIER_GREEN_LIGHT));
+	addChild(createLight<SmallLight<GreenRedLight>>(Vec(20, 167), module, Warps::CARRIER_GREEN_LIGHT));
 
-	struct AlgorithmLight : RedGreenBlueLight {
-		AlgorithmLight() {
-			box.size = Vec(71, 71);
-		}
-	};
-	addChild(ModuleLightWidget::create<AlgorithmLight>(Vec(40, 63), module, Warps::ALGORITHM_LIGHT));
+	// struct AlgorithmLight : RedGreenBlueLight {
+	// 	AlgorithmLight() {
+	// 		box.size = Vec(71, 71);
+	// 	}
+	// };
+	// addChild(createLight<AlgorithmLight>(Vec(40, 63), module, Warps::ALGORITHM_LIGHT));
+	addChild(createLightCentered<Rogan6PSLight<RedGreenBlueLight>>(Vec(73.556641, 96.560532), module, Warps::ALGORITHM_LIGHT));
+
 }
 
 struct WarpsModeItem : MenuItem {
@@ -195,8 +195,8 @@ struct WarpsModeItem : MenuItem {
 	}
 };
 
-Menu *WarpsWidget::createContextMenu() {
-  	Menu *menu = ModuleWidget::createContextMenu();
+Menu *WarpscreateWidgetContextMenu() {
+  	Menu *menu = ModulecreateWidgetContextMenu();
 	Warps *module = dynamic_cast<Warps*>(this->module);
 
 	menu->addChild(construct<MenuLabel>());
@@ -216,4 +216,4 @@ Menu *WarpsWidget::createContextMenu() {
 	return menu;
 }
 
-Model *modelWarps = Model::create<Warps, WarpsWidget>("Warps");
+Model *modelWarps = createModel<Warps, WarpsWidget>("Warps");

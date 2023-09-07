@@ -54,6 +54,7 @@ struct Tides : Module {
 	dsp::SchmittTrigger rangeTrigger;
 
 	Tides() {
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);		
 		configParam(Tides::MODE_PARAM, 0.0, 1.0, 0.0, "");
 		configParam(Tides::RANGE_PARAM, 0.0, 1.0, 0.0, "");
 		configParam(Tides::FREQUENCY_PARAM, -48.0, 48.0, 0.0, "");
@@ -61,6 +62,11 @@ struct Tides : Module {
 		configParam(Tides::SHAPE_PARAM, -1.0, 1.0, 0.0, "");
 		configParam(Tides::SLOPE_PARAM, -1.0, 1.0, 0.0, "");
 		configParam(Tides::SMOOTHNESS_PARAM, -1.0, 1.0, 0.0, "");
+
+		memset(&generator, 0, sizeof(generator));
+		generator.Init();
+		generator.set_sync(false);
+		onReset();
 	}
 	
 	void process(const ProcessArgs& args) override;
@@ -72,8 +78,8 @@ struct Tides : Module {
 	}
 
 	void onRandomize() override {
-		generator.set_range((tides::GeneratorRange) (randomu32() % 3));
-		generator.set_mode((tides::GeneratorMode) (randomu32() % 3));
+		generator.set_range((tides::GeneratorRange) (random::u32() % 3));
+		generator.set_mode((tides::GeneratorMode) (random::u32() % 3));
 	}
 
 	json_t* dataToJson() override {
@@ -104,14 +110,6 @@ struct Tides : Module {
 		}
 	}
 };
-
-
-Tides::Tides() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
-	memset(&generator, 0, sizeof(generator));
-	generator.Init();
-	generator.set_sync(false);
-	reset();
-}
 
 void Tides::process(const ProcessArgs& args) {
 	tides::GeneratorMode mode = generator.mode();
@@ -233,12 +231,12 @@ struct TidesWidget : ModuleWidget {
 
 TidesWidget::TidesWidget(Tides *module) {
 	setModule(module);
-	setPanel(createPanel(assetPlugin(pluginInstance, "res/Cycles.svg")));
+	setPanel(APP->window->loadSvg(assetPlugin(pluginInstance, "res/Cycles.svg")));
 
-	addChild(Widget::create<ScrewSilver>(Vec(15, 0)));
-	addChild(Widget::create<ScrewSilver>(Vec(180, 0)));
-	addChild(Widget::create<ScrewSilver>(Vec(15, 365)));
-	addChild(Widget::create<ScrewSilver>(Vec(180, 365)));
+	addChild(createWidget<ScrewSilver>(Vec(15, 0)));
+	addChild(createWidget<ScrewSilver>(Vec(180, 0)));
+	addChild(createWidget<ScrewSilver>(Vec(15, 365)));
+	addChild(createWidget<ScrewSilver>(Vec(180, 365)));
 
 	addParam(createParam<CKD6>(Vec(20, 52), module, Tides::MODE_PARAM));
 	addParam(createParam<CKD6>(Vec(20, 93), module, Tides::RANGE_PARAM));
@@ -266,9 +264,9 @@ TidesWidget::TidesWidget(Tides *module) {
 	addOutput(createOutput<PJ301MPort>(Vec(128, 316), module, Tides::UNI_OUTPUT));
 	addOutput(createOutput<PJ301MPort>(Vec(164, 316), module, Tides::BI_OUTPUT));
 
-	addChild(ModuleLightWidget::create<MediumLight<GreenRedLight>>(Vec(57, 61), module, Tides::MODE_GREEN_LIGHT));
-	addChild(ModuleLightWidget::create<MediumLight<GreenRedLight>>(Vec(57, 82), module, Tides::PHASE_GREEN_LIGHT));
-	addChild(ModuleLightWidget::create<MediumLight<GreenRedLight>>(Vec(57, 102), module, Tides::RANGE_GREEN_LIGHT));
+	addChild(ModuleLightcreateWidget<MediumLight<GreenRedLight>>(Vec(57, 61), module, Tides::MODE_GREEN_LIGHT));
+	addChild(ModuleLightcreateWidget<MediumLight<GreenRedLight>>(Vec(57, 82), module, Tides::PHASE_GREEN_LIGHT));
+	addChild(ModuleLightcreateWidget<MediumLight<GreenRedLight>>(Vec(57, 102), module, Tides::RANGE_GREEN_LIGHT));
 }
 
 struct TidesSheepItem : MenuItem {
@@ -307,8 +305,8 @@ struct TidesQuantizerItem : MenuItem {
 };
 
 
-Menu *TidesWidget::createContextMenu() {
-	Menu *menu = ModuleWidget::createContextMenu();
+Menu *TidescreateWidgetContextMenu() {
+	Menu *menu = ModulecreateWidgetContextMenu();
 
 	Tides *tides = dynamic_cast<Tides*>(this->module);
 	assert(tides);
@@ -336,4 +334,4 @@ Menu *TidesWidget::createContextMenu() {
 	return menu;
 }
 
-Model *modelTides = Model::create<Tides, TidesWidget>("Tides");
+Model *modelTides = createModel<Tides, TidesWidget>("Tides");

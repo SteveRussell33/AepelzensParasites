@@ -81,11 +81,16 @@ struct Tapeworm : Module {
 	DelayInterpolation delay_interpolation_;
 
 	Tapeworm() {
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);		
 		configParam(Tapeworm::ALGORITHM_PARAM, 0.0, 8.0, 0.0, "");
 		configParam(Tapeworm::TIMBRE_PARAM, 0.0, 1.0, 0.5, "");
 		configParam(Tapeworm::STATE_PARAM, 0.0, 1.0, 0.0, "");
 		configParam(Tapeworm::LEVEL1_PARAM, 0.0, 1.0, 1.0, "");
 		configParam(Tapeworm::LEVEL2_PARAM, 0.0, 1.0, 1.0, "");
+
+		// memset(&modulator, 0, sizeof(modulator));
+		// modulator.Init(96000.0f);
+		delay_interpolation_ = INTERPOLATION_HERMITE;
 	}
 	
 	void process(const ProcessArgs& args) override;
@@ -108,16 +113,9 @@ struct Tapeworm : Module {
 	}
 
 	void onRandomize() override {
-		parameters_.carrier_shape = randomu32() % 4;
+		parameters_.carrier_shape = random::u32() % 4;
 	}
 };
-
-
-Tapeworm::Tapeworm() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
-	// memset(&modulator, 0, sizeof(modulator));
-	// modulator.Init(96000.0f);
-	delay_interpolation_ = INTERPOLATION_HERMITE;
-}
 
 //Delay Code from parasites firmware
 void Tapeworm::ProcessDelay(warps::ShortFrame* input, warps::ShortFrame* output, size_t size) {
@@ -399,12 +397,12 @@ struct TapewormWidget : ModuleWidget {
 
 TapewormWidget::TapewormWidget(Tapeworm* module) {
 	setModule(module);
-	setPanel(createPanel(assetPlugin(pluginInstance, "res/Tapeworm.svg")));
+	setPanel(APP->window->loadSvg(assetPlugin(pluginInstance, "res/Tapeworm.svg")));
 
-	addChild(Widget::create<ScrewSilver>(Vec(15, 0)));
-	addChild(Widget::create<ScrewSilver>(Vec(120, 0)));
-	addChild(Widget::create<ScrewSilver>(Vec(15, 365)));
-	addChild(Widget::create<ScrewSilver>(Vec(120, 365)));
+	addChild(createWidget<ScrewSilver>(Vec(15, 0)));
+	addChild(createWidget<ScrewSilver>(Vec(120, 0)));
+	addChild(createWidget<ScrewSilver>(Vec(15, 365)));
+	addChild(createWidget<ScrewSilver>(Vec(120, 365)));
 
 	addParam(createParam<Rogan6PSWhite>(Vec(29, 52), module, Tapeworm::ALGORITHM_PARAM));
 
@@ -423,14 +421,15 @@ TapewormWidget::TapewormWidget(Tapeworm* module) {
 	addOutput(createOutput<PJ301MPort>(Vec(80, 316), module, Tapeworm::MODULATOR_OUTPUT));
 	addOutput(createOutput<PJ301MPort>(Vec(116, 316), module, Tapeworm::AUX_OUTPUT));
 
-	addChild(ModuleLightWidget::create<SmallLight<GreenRedLight>>(Vec(20, 167), module, Tapeworm::CARRIER_GREEN_LIGHT));
+	addChild(createLight<SmallLight<GreenRedLight>>(Vec(20, 167), module, Tapeworm::CARRIER_GREEN_LIGHT));
 
-	struct AlgorithmLight : RedGreenBlueLight {
-		AlgorithmLight() {
-			box.size = Vec(71, 71);
-		}
-	};
-	addChild(ModuleLightWidget::create<AlgorithmLight>(Vec(40, 63), module, Tapeworm::ALGORITHM_LIGHT));
+	// struct AlgorithmLight : RedGreenBlueLight {
+	// 	AlgorithmLight() {
+	// 		box.size = Vec(71, 71);
+	// 	}
+	// };
+	// addChild(ModuleLightcreateWidget<AlgorithmLight>(Vec(40, 63), module, Tapeworm::ALGORITHM_LIGHT));
+	addChild(createLightCentered<Rogan6PSLight<RedGreenBlueLight>>(Vec(73.556641, 96.560532), module, Warps::ALGORITHM_LIGHT));
 }
 
-Model *modelTapeworm = Model::create<Tapeworm, TapewormWidget>("Tapeworm");
+Model *modelTapeworm = createModel<Tapeworm, TapewormWidget>("Tapeworm");
