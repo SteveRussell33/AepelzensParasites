@@ -105,12 +105,15 @@ void Warps::process(const ProcessArgs& args) {
 		//According to the cv-scaler this does not seem to use the plot curve
 		p->raw_algorithm = clamp(params[ALGORITHM_PARAM].value /8.0f + inputs[ALGORITHM_INPUT].value /5.0f, 0.0f, 1.0f);
 		{
-			// TODO
-			// Use the correct light color
-			NVGcolor algorithmColor = nvgHSL(p->modulation_algorithm, 0.3, 0.4);
-			lights[ALGORITHM_LIGHT + 0].setBrightness(algorithmColor.r);
-			lights[ALGORITHM_LIGHT + 1].setBrightness(algorithmColor.g);
-			lights[ALGORITHM_LIGHT + 2].setBrightness(algorithmColor.b);
+			// Taken from eurorack\warps\ui.cc
+			float zone = 8.0f * p->modulation_algorithm;
+            MAKE_INTEGRAL_FRACTIONAL(zone);
+            int zone_fractional_i = static_cast<int>(zone_fractional * 256.0f);
+            for (int i = 0; i < 3; i++) {
+                int a = algorithm_palette[zone_integral][i];
+                int b = algorithm_palette[zone_integral + 1][i];
+                lights[ALGORITHM_LIGHT + i].setBrightness(static_cast<float>(a + ((b - a) * zone_fractional_i >> 8)) / 255.0f);
+            }
 		}
 
 		p->modulation_parameter = clamp(params[TIMBRE_PARAM].value + inputs[TIMBRE_INPUT].value / 5.0f, 0.0f, 1.0f);
