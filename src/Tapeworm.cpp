@@ -38,7 +38,7 @@ struct Tapeworm : Module {
 	warps::Modulator modulator;
 	warps::ShortFrame inputFrames[60] = {};
 	warps::ShortFrame outputFrames[60] = {};
-	SchmittTrigger stateTrigger;
+	dsp::SchmittTrigger stateTrigger;
 
 	//Parasites variables
 	static const size_t kMaxBlockSize = 96;
@@ -406,15 +406,15 @@ TapewormWidget::TapewormWidget(Tapeworm* module) {
 	addParam(createParam<Trimpot>(Vec(14, 213), module, Tapeworm::LEVEL1_PARAM, 0.0, 1.0, 1.0));
 	addParam(createParam<Trimpot>(Vec(53, 213), module, Tapeworm::LEVEL2_PARAM, 0.0, 1.0, 1.0));
 
-	addInput(createPort<PJ301MPort>(Vec(8, 273), PortWidget::INPUT, module, Tapeworm::LEVEL1_INPUT));
-	addInput(createPort<PJ301MPort>(Vec(44, 273), PortWidget::INPUT, module, Tapeworm::LEVEL2_INPUT));
-	addInput(createPort<PJ301MPort>(Vec(80, 273), PortWidget::INPUT, module, Tapeworm::ALGORITHM_INPUT));
-	addInput(createPort<PJ301MPort>(Vec(116, 273), PortWidget::INPUT, module, Tapeworm::TIMBRE_INPUT));
+	addInput(createInput<PJ301MPort>(Vec(8, 273), module, Tapeworm::LEVEL1_INPUT));
+	addInput(createInput<PJ301MPort>(Vec(44, 273), module, Tapeworm::LEVEL2_INPUT));
+	addInput(createInput<PJ301MPort>(Vec(80, 273), module, Tapeworm::ALGORITHM_INPUT));
+	addInput(createInput<PJ301MPort>(Vec(116, 273), module, Tapeworm::TIMBRE_INPUT));
 
-	addInput(createPort<PJ301MPort>(Vec(8, 316), PortWidget::INPUT, module, Tapeworm::CARRIER_INPUT));
-	addInput(createPort<PJ301MPort>(Vec(44, 316), PortWidget::INPUT, module, Tapeworm::MODULATOR_INPUT));
-	addOutput(createPort<PJ301MPort>(Vec(80, 316), PortWidget::OUTPUT, module, Tapeworm::MODULATOR_OUTPUT));
-	addOutput(createPort<PJ301MPort>(Vec(116, 316), PortWidget::OUTPUT, module, Tapeworm::AUX_OUTPUT));
+	addInput(createInput<PJ301MPort>(Vec(8, 316), module, Tapeworm::CARRIER_INPUT));
+	addInput(createInput<PJ301MPort>(Vec(44, 316), module, Tapeworm::MODULATOR_INPUT));
+	addOutput(createOutput<PJ301MPort>(Vec(80, 316), module, Tapeworm::MODULATOR_OUTPUT));
+	addOutput(createOutput<PJ301MPort>(Vec(116, 316), module, Tapeworm::AUX_OUTPUT));
 
 	addChild(ModuleLightWidget::create<SmallLight<GreenRedLight>>(Vec(20, 167), module, Tapeworm::CARRIER_GREEN_LIGHT));
 

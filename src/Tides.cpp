@@ -50,8 +50,8 @@ struct Tides : Module {
 	uint8_t quantize = 0;
 	int frame = 0;
 	uint8_t lastGate;
-	SchmittTrigger modeTrigger;
-	SchmittTrigger rangeTrigger;
+	dsp::SchmittTrigger modeTrigger;
+	dsp::SchmittTrigger rangeTrigger;
 
 	Tides();
 	void process(const ProcessArgs& args) override;
@@ -241,21 +241,21 @@ TidesWidget::TidesWidget(Tides *module) {
 	addParam(createParam<Rogan1PSWhite>(Vec(85, 155), module, Tides::SLOPE_PARAM, -1.0, 1.0, 0.0));
 	addParam(createParam<Rogan1PSWhite>(Vec(156, 155), module, Tides::SMOOTHNESS_PARAM, -1.0, 1.0, 0.0));
 
-	addInput(createPort<PJ301MPort>(Vec(21, 219), PortWidget::INPUT, module, Tides::SHAPE_INPUT));
-	addInput(createPort<PJ301MPort>(Vec(93, 219), PortWidget::INPUT, module, Tides::SLOPE_INPUT));
-	addInput(createPort<PJ301MPort>(Vec(164, 219), PortWidget::INPUT, module, Tides::SMOOTHNESS_INPUT));
+	addInput(createInput<PJ301MPort>(Vec(21, 219), module, Tides::SHAPE_INPUT));
+	addInput(createInput<PJ301MPort>(Vec(93, 219), module, Tides::SLOPE_INPUT));
+	addInput(createInput<PJ301MPort>(Vec(164, 219), module, Tides::SMOOTHNESS_INPUT));
 
-	addInput(createPort<PJ301MPort>(Vec(21, 274), PortWidget::INPUT, module, Tides::TRIG_INPUT));
-	addInput(createPort<PJ301MPort>(Vec(57, 274), PortWidget::INPUT, module, Tides::FREEZE_INPUT));
-	addInput(createPort<PJ301MPort>(Vec(93, 274), PortWidget::INPUT, module, Tides::PITCH_INPUT));
-	addInput(createPort<PJ301MPort>(Vec(128, 274), PortWidget::INPUT, module, Tides::FM_INPUT));
-	addInput(createPort<PJ301MPort>(Vec(164, 274), PortWidget::INPUT, module, Tides::LEVEL_INPUT));
+	addInput(createInput<PJ301MPort>(Vec(21, 274), module, Tides::TRIG_INPUT));
+	addInput(createInput<PJ301MPort>(Vec(57, 274), module, Tides::FREEZE_INPUT));
+	addInput(createInput<PJ301MPort>(Vec(93, 274), module, Tides::PITCH_INPUT));
+	addInput(createInput<PJ301MPort>(Vec(128, 274), module, Tides::FM_INPUT));
+	addInput(createInput<PJ301MPort>(Vec(164, 274), module, Tides::LEVEL_INPUT));
 
-	addInput(createPort<PJ301MPort>(Vec(21, 316), PortWidget::INPUT, module, Tides::CLOCK_INPUT));
-	addOutput(createPort<PJ301MPort>(Vec(57, 316), PortWidget::OUTPUT, module, Tides::HIGH_OUTPUT));
-	addOutput(createPort<PJ301MPort>(Vec(93, 316), PortWidget::OUTPUT, module, Tides::LOW_OUTPUT));
-	addOutput(createPort<PJ301MPort>(Vec(128, 316), PortWidget::OUTPUT, module, Tides::UNI_OUTPUT));
-	addOutput(createPort<PJ301MPort>(Vec(164, 316), PortWidget::OUTPUT, module, Tides::BI_OUTPUT));
+	addInput(createInput<PJ301MPort>(Vec(21, 316), module, Tides::CLOCK_INPUT));
+	addOutput(createOutput<PJ301MPort>(Vec(57, 316), module, Tides::HIGH_OUTPUT));
+	addOutput(createOutput<PJ301MPort>(Vec(93, 316), module, Tides::LOW_OUTPUT));
+	addOutput(createOutput<PJ301MPort>(Vec(128, 316), module, Tides::UNI_OUTPUT));
+	addOutput(createOutput<PJ301MPort>(Vec(164, 316), module, Tides::BI_OUTPUT));
 
 	addChild(ModuleLightWidget::create<MediumLight<GreenRedLight>>(Vec(57, 61), module, Tides::MODE_GREEN_LIGHT));
 	addChild(ModuleLightWidget::create<MediumLight<GreenRedLight>>(Vec(57, 82), module, Tides::PHASE_GREEN_LIGHT));
@@ -301,7 +301,7 @@ struct TidesQuantizerItem : MenuItem {
 Menu *TidesWidget::createContextMenu() {
 	Menu *menu = ModuleWidget::createContextMenu();
 
-	Tides *tides = dynamic_cast<Tides*>(module);
+	Tides *tides = dynamic_cast<Tides*>(this->module);
 	assert(tides);
 
 #ifdef WAVETABLE_HACK

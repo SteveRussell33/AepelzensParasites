@@ -36,7 +36,7 @@ struct Warps : Module {
 	warps::Modulator modulator;
 	warps::ShortFrame inputFrames[60] = {};
 	warps::ShortFrame outputFrames[60] = {};
-	SchmittTrigger stateTrigger;
+	dsp::SchmittTrigger stateTrigger;
 
 	Warps();
 	void process(const ProcessArgs& args) override;
@@ -155,15 +155,15 @@ WarpsWidget::WarpsWidget(Warps *module) {
 	addParam(createParam<Trimpot>(Vec(14, 213), module, Warps::LEVEL1_PARAM, 0.0, 1.0, 1.0));
 	addParam(createParam<Trimpot>(Vec(53, 213), module, Warps::LEVEL2_PARAM, 0.0, 1.0, 1.0));
 
-	addInput(createPort<PJ301MPort>(Vec(8, 273), PortWidget::INPUT, module, Warps::LEVEL1_INPUT));
-	addInput(createPort<PJ301MPort>(Vec(44, 273), PortWidget::INPUT, module, Warps::LEVEL2_INPUT));
-	addInput(createPort<PJ301MPort>(Vec(80, 273), PortWidget::INPUT, module, Warps::ALGORITHM_INPUT));
-	addInput(createPort<PJ301MPort>(Vec(116, 273), PortWidget::INPUT, module, Warps::TIMBRE_INPUT));
+	addInput(createInput<PJ301MPort>(Vec(8, 273), module, Warps::LEVEL1_INPUT));
+	addInput(createInput<PJ301MPort>(Vec(44, 273), module, Warps::LEVEL2_INPUT));
+	addInput(createInput<PJ301MPort>(Vec(80, 273), module, Warps::ALGORITHM_INPUT));
+	addInput(createInput<PJ301MPort>(Vec(116, 273), module, Warps::TIMBRE_INPUT));
 
-	addInput(createPort<PJ301MPort>(Vec(8, 316), PortWidget::INPUT, module, Warps::CARRIER_INPUT));
-	addInput(createPort<PJ301MPort>(Vec(44, 316), PortWidget::INPUT, module, Warps::MODULATOR_INPUT));
-	addOutput(createPort<PJ301MPort>(Vec(80, 316), PortWidget::OUTPUT, module, Warps::MODULATOR_OUTPUT));
-	addOutput(createPort<PJ301MPort>(Vec(116, 316), PortWidget::OUTPUT, module, Warps::AUX_OUTPUT));
+	addInput(createInput<PJ301MPort>(Vec(8, 316), module, Warps::CARRIER_INPUT));
+	addInput(createInput<PJ301MPort>(Vec(44, 316), module, Warps::MODULATOR_INPUT));
+	addOutput(createOutput<PJ301MPort>(Vec(80, 316), module, Warps::MODULATOR_OUTPUT));
+	addOutput(createOutput<PJ301MPort>(Vec(116, 316), module, Warps::AUX_OUTPUT));
 
 	addChild(ModuleLightWidget::create<SmallLight<GreenRedLight>>(Vec(20, 167), module, Warps::CARRIER_GREEN_LIGHT));
 
