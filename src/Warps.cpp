@@ -38,7 +38,14 @@ struct Warps : Module {
 	warps::ShortFrame outputFrames[60] = {};
 	dsp::SchmittTrigger stateTrigger;
 
-	Warps();
+	Warps() {
+		configParam(Warps::ALGORITHM_PARAM, 0.0, 8.0, 0.0, "");
+		configParam(Warps::TIMBRE_PARAM, 0.0, 1.0, 0.5, "");
+		configParam(Warps::STATE_PARAM, 0.0, 1.0, 0.0, "");
+		configParam(Warps::LEVEL1_PARAM, 0.0, 1.0, 1.0, "");
+		configParam(Warps::LEVEL2_PARAM, 0.0, 1.0, 1.0, "");
+	}
+	
 	void process(const ProcessArgs& args) override;
 
 	json_t* dataToJson() override {
@@ -59,13 +66,13 @@ struct Warps : Module {
 		}
 	}
 
-	void reset() override {
+	void onReset() override {
 		warps::Parameters* p = modulator.mutable_parameters();
 		p->carrier_shape = 0;
 		modulator.set_feature_mode(warps::FEATURE_MODE_META);
 	}
 
-	void randomize() override {
+	void onRandomize() override {
 		warps::Parameters* p = modulator.mutable_parameters();
 		p->carrier_shape = randomu32() % 4;
 	}
@@ -148,12 +155,12 @@ WarpsWidget::WarpsWidget(Warps *module) {
 	addChild(Widget::create<ScrewSilver>(Vec(15, 365)));
 	addChild(Widget::create<ScrewSilver>(Vec(120, 365)));
 
-	addParam(createParam<Rogan6PSWhite>(Vec(29, 52), module, Warps::ALGORITHM_PARAM, 0.0, 8.0, 0.0));
+	addParam(createParam<Rogan6PSWhite>(Vec(29, 52), module, Warps::ALGORITHM_PARAM));
 
-	addParam(createParam<Rogan1PSWhite>(Vec(94, 173), module, Warps::TIMBRE_PARAM, 0.0, 1.0, 0.5));
-	addParam(createParam<TL1105>(Vec(16, 182), module, Warps::STATE_PARAM, 0.0, 1.0, 0.0));
-	addParam(createParam<Trimpot>(Vec(14, 213), module, Warps::LEVEL1_PARAM, 0.0, 1.0, 1.0));
-	addParam(createParam<Trimpot>(Vec(53, 213), module, Warps::LEVEL2_PARAM, 0.0, 1.0, 1.0));
+	addParam(createParam<Rogan1PSWhite>(Vec(94, 173), module, Warps::TIMBRE_PARAM));
+	addParam(createParam<TL1105>(Vec(16, 182), module, Warps::STATE_PARAM));
+	addParam(createParam<Trimpot>(Vec(14, 213), module, Warps::LEVEL1_PARAM));
+	addParam(createParam<Trimpot>(Vec(53, 213), module, Warps::LEVEL2_PARAM));
 
 	addInput(createInput<PJ301MPort>(Vec(8, 273), module, Warps::LEVEL1_INPUT));
 	addInput(createInput<PJ301MPort>(Vec(44, 273), module, Warps::LEVEL2_INPUT));

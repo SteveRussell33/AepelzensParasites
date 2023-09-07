@@ -80,7 +80,14 @@ struct Tapeworm : Module {
 
 	DelayInterpolation delay_interpolation_;
 
-	Tapeworm();
+	Tapeworm() {
+		configParam(Tapeworm::ALGORITHM_PARAM, 0.0, 8.0, 0.0, "");
+		configParam(Tapeworm::TIMBRE_PARAM, 0.0, 1.0, 0.5, "");
+		configParam(Tapeworm::STATE_PARAM, 0.0, 1.0, 0.0, "");
+		configParam(Tapeworm::LEVEL1_PARAM, 0.0, 1.0, 1.0, "");
+		configParam(Tapeworm::LEVEL2_PARAM, 0.0, 1.0, 1.0, "");
+	}
+	
 	void process(const ProcessArgs& args) override;
 	void ProcessDelay(warps::ShortFrame* input, warps::ShortFrame* output, size_t size);
 
@@ -96,11 +103,11 @@ struct Tapeworm : Module {
 		}
 	}
 
-	void reset() override {
+	void onReset() override {
 		parameters_.carrier_shape = 0;
 	}
 
-	void randomize() override {
+	void onRandomize() override {
 		parameters_.carrier_shape = randomu32() % 4;
 	}
 };
@@ -399,12 +406,12 @@ TapewormWidget::TapewormWidget(Tapeworm* module) {
 	addChild(Widget::create<ScrewSilver>(Vec(15, 365)));
 	addChild(Widget::create<ScrewSilver>(Vec(120, 365)));
 
-	addParam(createParam<Rogan6PSWhite>(Vec(29, 52), module, Tapeworm::ALGORITHM_PARAM, 0.0, 8.0, 0.0));
+	addParam(createParam<Rogan6PSWhite>(Vec(29, 52), module, Tapeworm::ALGORITHM_PARAM));
 
-	addParam(createParam<Rogan1PSWhite>(Vec(94, 173), module, Tapeworm::TIMBRE_PARAM, 0.0, 1.0, 0.5));
-	addParam(createParam<TL1105>(Vec(16, 182), module, Tapeworm::STATE_PARAM, 0.0, 1.0, 0.0));
-	addParam(createParam<Trimpot>(Vec(14, 213), module, Tapeworm::LEVEL1_PARAM, 0.0, 1.0, 1.0));
-	addParam(createParam<Trimpot>(Vec(53, 213), module, Tapeworm::LEVEL2_PARAM, 0.0, 1.0, 1.0));
+	addParam(createParam<Rogan1PSWhite>(Vec(94, 173), module, Tapeworm::TIMBRE_PARAM));
+	addParam(createParam<TL1105>(Vec(16, 182), module, Tapeworm::STATE_PARAM));
+	addParam(createParam<Trimpot>(Vec(14, 213), module, Tapeworm::LEVEL1_PARAM));
+	addParam(createParam<Trimpot>(Vec(53, 213), module, Tapeworm::LEVEL2_PARAM));
 
 	addInput(createInput<PJ301MPort>(Vec(8, 273), module, Tapeworm::LEVEL1_INPUT));
 	addInput(createInput<PJ301MPort>(Vec(44, 273), module, Tapeworm::LEVEL2_INPUT));
