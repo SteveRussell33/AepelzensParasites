@@ -4,11 +4,11 @@
   "version": "2.0.0",
   "license": "MIT",
   "brand": "Aepelzens Parasites",
-  "author": "Aepelzen & Steve Russell",
+  "author": "Aepelzen, Matthias Puech & Steve Russell",
   "authorEmail": "",
   "authorUrl": "",
   "pluginUrl": "https://github.com/SteveRussell33/AepelzensParasites",
-  "manualUrl": "",
+  "manualUrl": "https://mqtthiqs.github.io/parasites/index.html",
   "sourceUrl": "https://github.com/SteveRussell33/AepelzensParasites",
   "donateUrl": "",
   "modules": [
