@@ -15,7 +15,7 @@
     {
       "slug": "Tapeworm",
       "name": "Tapeworm",
-      "description": "",
+      "description": "Parasitic delay module",
       "tags": [
         "Delay",
         "Effect"
@@ -24,7 +24,7 @@
     {
       "slug": "Tides",
       "name": "Cycles",
-      "description": "",
+      "description": "Tidal modulator",
       "tags": [
         "LFO",
         "VCO",
@@ -36,7 +36,7 @@
     {
       "slug": "Warps",
       "name": "Wasp",
-      "description": "",
+      "description": "Meta-modulator",
       "tags": [
         "Ring modulator",
         "Waveshaper",
