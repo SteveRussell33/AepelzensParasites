@@ -1,0 +1,47 @@
+{
+  "slug": "AepelzensParasites",
+  "name": "Aepelzens Parasites",
+  "version": "2.0.0",
+  "license": "MIT",
+  "brand": "Aepelzens Parasites",
+  "author": "Aepelzen & Steve Russell",
+  "authorEmail": "",
+  "authorUrl": "",
+  "pluginUrl": "https://github.com/SteveRussell33/AepelzensParasites",
+  "manualUrl": "",
+  "sourceUrl": "https://github.com/SteveRussell33/AepelzensParasites",
+  "donateUrl": "",
+  "modules": [
+    {
+      "slug": "Tapeworm",
+      "name": "Tapeworm",
+      "description": "",
+      "tags": [
+        "Delay",
+        "Effect"
+      ]
+    },
+    {
+      "slug": "Tides",
+      "name": "Cycles",
+      "description": "",
+      "tags": [
+        "LFO",
+        "VCO",
+        "Waveshaper",
+        "Function generator",
+        "Random"
+      ]
+    }
+    {
+      "slug": "Warps",
+      "name": "Wasp",
+      "description": "",
+      "tags": [
+        "Ring modulator",
+        "Waveshaper",
+        "Effect"        
+      ]
+    }
+  ]
+}
