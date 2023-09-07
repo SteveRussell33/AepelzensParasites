@@ -1,12 +1,10 @@
 #include "AepelzensParasites.hpp"
 
 
-Plugin *plugin;
+Plugin *pluginInstance;
 
-void init(rack::Plugin *p) {
-	plugin = p;
-	p->slug = TOSTRING(SLUG);
-	p->version = TOSTRING(VERSION);
+void init(Plugin *p) {
+	pluginInstance = p;
 
 	p->addModel(modelWarps);
 	p->addModel(modelTapeworm);
