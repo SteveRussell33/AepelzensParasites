@@ -84,13 +84,13 @@ struct Tapeworm : Module {
 	void step() override;
 	void ProcessDelay(warps::ShortFrame* input, warps::ShortFrame* output, size_t size);
 
-	json_t *toJson() override {
+	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
 		json_object_set_new(rootJ, "shape", json_integer(parameters_.carrier_shape));
 		return rootJ;
 	}
 
-	void fromJson(json_t *rootJ) override {
+	void dataFromJson(json_t *rootJ) override {
 		json_t *shapeJ = json_object_get(rootJ, "shape");
 		if (shapeJ) {
 			parameters_.carrier_shape = json_integer_value(shapeJ);
@@ -388,30 +388,31 @@ struct TapewormWidget : ModuleWidget {
 	TapewormWidget(Tapeworm *module);
 };
 
-TapewormWidget::TapewormWidget(Tapeworm *module) : ModuleWidget(module) {
-	setPanel(SVG::load(assetPlugin(pluginInstance, "res/Tapeworm.svg")));
+TapewormWidget::TapewormWidget(Tapeworm *module) {
+	setModule(module);
+	setPanel(createPanel(assetPlugin(pluginInstance, "res/Tapeworm.svg")));
 
 	addChild(Widget::create<ScrewSilver>(Vec(15, 0)));
 	addChild(Widget::create<ScrewSilver>(Vec(120, 0)));
 	addChild(Widget::create<ScrewSilver>(Vec(15, 365)));
 	addChild(Widget::create<ScrewSilver>(Vec(120, 365)));
 
-	addParam(ParamWidget::create<Rogan6PSWhite>(Vec(29, 52), module, Tapeworm::ALGORITHM_PARAM, 0.0, 8.0, 0.0));
+	addParam(createParam<Rogan6PSWhite>(Vec(29, 52), module, Tapeworm::ALGORITHM_PARAM, 0.0, 8.0, 0.0));
 
-	addParam(ParamWidget::create<Rogan1PSWhite>(Vec(94, 173), module, Tapeworm::TIMBRE_PARAM, 0.0, 1.0, 0.5));
-	addParam(ParamWidget::create<TL1105>(Vec(16, 182), module, Tapeworm::STATE_PARAM, 0.0, 1.0, 0.0));
-	addParam(ParamWidget::create<Trimpot>(Vec(14, 213), module, Tapeworm::LEVEL1_PARAM, 0.0, 1.0, 1.0));
-	addParam(ParamWidget::create<Trimpot>(Vec(53, 213), module, Tapeworm::LEVEL2_PARAM, 0.0, 1.0, 1.0));
+	addParam(createParam<Rogan1PSWhite>(Vec(94, 173), module, Tapeworm::TIMBRE_PARAM, 0.0, 1.0, 0.5));
+	addParam(createParam<TL1105>(Vec(16, 182), module, Tapeworm::STATE_PARAM, 0.0, 1.0, 0.0));
+	addParam(createParam<Trimpot>(Vec(14, 213), module, Tapeworm::LEVEL1_PARAM, 0.0, 1.0, 1.0));
+	addParam(createParam<Trimpot>(Vec(53, 213), module, Tapeworm::LEVEL2_PARAM, 0.0, 1.0, 1.0));
 
-	addInput(Port::create<PJ301MPort>(Vec(8, 273), Port::INPUT, module, Tapeworm::LEVEL1_INPUT));
-	addInput(Port::create<PJ301MPort>(Vec(44, 273), Port::INPUT, module, Tapeworm::LEVEL2_INPUT));
-	addInput(Port::create<PJ301MPort>(Vec(80, 273), Port::INPUT, module, Tapeworm::ALGORITHM_INPUT));
-	addInput(Port::create<PJ301MPort>(Vec(116, 273), Port::INPUT, module, Tapeworm::TIMBRE_INPUT));
+	addInput(createPort<PJ301MPort>(Vec(8, 273), PortWidget::INPUT, module, Tapeworm::LEVEL1_INPUT));
+	addInput(createPort<PJ301MPort>(Vec(44, 273), PortWidget::INPUT, module, Tapeworm::LEVEL2_INPUT));
+	addInput(createPort<PJ301MPort>(Vec(80, 273), PortWidget::INPUT, module, Tapeworm::ALGORITHM_INPUT));
+	addInput(createPort<PJ301MPort>(Vec(116, 273), PortWidget::INPUT, module, Tapeworm::TIMBRE_INPUT));
 
-	addInput(Port::create<PJ301MPort>(Vec(8, 316), Port::INPUT, module, Tapeworm::CARRIER_INPUT));
-	addInput(Port::create<PJ301MPort>(Vec(44, 316), Port::INPUT, module, Tapeworm::MODULATOR_INPUT));
-	addOutput(Port::create<PJ301MPort>(Vec(80, 316), Port::OUTPUT, module, Tapeworm::MODULATOR_OUTPUT));
-	addOutput(Port::create<PJ301MPort>(Vec(116, 316), Port::OUTPUT, module, Tapeworm::AUX_OUTPUT));
+	addInput(createPort<PJ301MPort>(Vec(8, 316), PortWidget::INPUT, module, Tapeworm::CARRIER_INPUT));
+	addInput(createPort<PJ301MPort>(Vec(44, 316), PortWidget::INPUT, module, Tapeworm::MODULATOR_INPUT));
+	addOutput(createPort<PJ301MPort>(Vec(80, 316), PortWidget::OUTPUT, module, Tapeworm::MODULATOR_OUTPUT));
+	addOutput(createPort<PJ301MPort>(Vec(116, 316), PortWidget::OUTPUT, module, Tapeworm::AUX_OUTPUT));
 
 	addChild(ModuleLightWidget::create<SmallLight<GreenRedLight>>(Vec(20, 167), module, Tapeworm::CARRIER_GREEN_LIGHT));
 
