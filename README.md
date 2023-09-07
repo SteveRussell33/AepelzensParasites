@@ -1,4 +1,5 @@
 # Aepelzens Parasites
+(Ported by Steve Russell for VCV Rack v2)
 
 This is a mod of some Audible Instruments Modules for VCV-Rack with the [parasites
 firmware](https://mqtthiqs.github.io/parasites/index.html). All credit goes to the authors of these
@@ -10,13 +11,13 @@ be found [here](https://mqtthiqs.github.io/parasites/index.html).
 
 ## Note
 
-The latest update renames the modules to comply with some copyright restrictions that i wasn't
+The latest update renames the modules to comply with some copyright restrictions that I wasn't
 aware of before. I kept the identifiers though so this should not break any saves.
 
 ## Wasp and Tapeworm (based on Warps Parasite)
 
-These two modules are based on the Warps Parasite. To fix the multiple-instance problem from older
-versions i took the delay code of the parasites firmware and split it out into it's own module called
+These two modules are based on Warps Parasite. To fix the multiple-instance problem from older
+versions I took the delay code of the parasites firmware and split it out into it's own module called
 Tapeworm. Wasp contains all the other modes except for the Doppler Panner which is disabled by
 default. You can enable it by adding "-DDOPPLER_PANNER" to the build flags but you can still
 only use one instance (that is set to Doppler mode).
@@ -33,4 +34,4 @@ original if you want sheep.
 
 ## Building
 
-After clonig the repo run: git submodule update --init parasites/stmlib
+After cloning the repo run: git submodule update --init parasites/stmlib
