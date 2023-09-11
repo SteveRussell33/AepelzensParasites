@@ -54,11 +54,11 @@ struct Warps : Module {
 
 	Warps() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		configParam(Warps::ALGORITHM_PARAM, 0.0, 8.0, 0.0, "");
-		configParam(Warps::TIMBRE_PARAM, 0.0, 1.0, 0.5, "");
-		configParam(Warps::STATE_PARAM, 0.0, 1.0, 0.0, "");
-		configParam(Warps::LEVEL1_PARAM, 0.0, 1.0, 1.0, "");
-		configParam(Warps::LEVEL2_PARAM, 0.0, 1.0, 1.0, "");
+		configParam(Warps::ALGORITHM_PARAM, 0.0, 8.0, 0.0, "Algorithm");
+		configParam(Warps::TIMBRE_PARAM, 0.0, 1.0, 0.5, "Timbre");
+		configParam(Warps::STATE_PARAM, 0.0, 1.0, 0.0, "Internal oscillator mode");
+		configParam(Warps::LEVEL1_PARAM, 0.0, 1.0, 1.0, "External oscillator amplitude / internal oscillator frequency");
+		configParam(Warps::LEVEL2_PARAM, 0.0, 1.0, 1.0, "Modulator amplitude");
 
 		memset(&modulator, 0, sizeof(modulator));
 		modulator.Init(96000.0f);
@@ -164,6 +164,7 @@ struct WarpsWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(120, 365)));
 
 		addParam(createParam<Rogan6PSWhite>(Vec(29, 52), module, Warps::ALGORITHM_PARAM));
+		// addParam(createParamCentered<Rogan6PSWhite>(Vec(73.556641, 96.560532), module, Warps::ALGORITHM_PARAM));
 
 		addParam(createParam<Rogan1PSWhite>(Vec(94, 173), module, Warps::TIMBRE_PARAM));
 		addParam(createParam<TL1105>(Vec(16, 182), module, Warps::STATE_PARAM));
@@ -182,24 +183,24 @@ struct WarpsWidget : ModuleWidget {
 
 		addChild(createLight<SmallLight<GreenRedLight>>(Vec(20, 167), module, Warps::CARRIER_GREEN_LIGHT));
 
-		// struct AlgorithmLight : RedGreenBlueLight {
-		// 	AlgorithmLight() {
-		// 		box.size = Vec(71, 71);
-		// 	}
-		// };
-		// addChild(createLight<AlgorithmLight>(Vec(40, 63), module, Warps::ALGORITHM_LIGHT));
-		addChild(createLightCentered<Rogan6PSLight<RedGreenBlueLight>>(Vec(73.556641, 96.560532), module, Warps::ALGORITHM_LIGHT));
+		struct AlgorithmLight : RedGreenBlueLight {
+			AlgorithmLight() {
+				box.size = Vec(71, 71);
+			}
+		};
+		addChild(createLight<AlgorithmLight>(Vec(40, 63), module, Warps::ALGORITHM_LIGHT));
+		// addChild(createLightCentered<Rogan6PSLight<RedGreenBlueLight>>(Vec(73.556641, 96.560532), module, Warps::ALGORITHM_LIGHT));
 	}
 
 	struct WarpsModeItem : MenuItem {
 		Warps *module;
 		warps::FeatureMode mode;
 		void onAction(const event::Action &e) override {
-		  //module->playback = playback;
-		  module->modulator.set_feature_mode(mode);
+			//module->playback = playback;
+			module->modulator.set_feature_mode(mode);
 		}
 		void step() override {
-		  rightText = (module->modulator.feature_mode() == mode) ? "✔" : "";
+			rightText = (module->modulator.feature_mode() == mode) ? "✔" : "";
 			MenuItem::step();
 		}
 	};

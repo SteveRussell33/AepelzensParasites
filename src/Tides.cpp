@@ -55,13 +55,13 @@ struct Tides : Module {
 	
 	Tides() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);		
-		configParam(Tides::MODE_PARAM, 0.0, 1.0, 0.0, "");
-		configParam(Tides::RANGE_PARAM, 0.0, 1.0, 0.0, "");
-		configParam(Tides::FREQUENCY_PARAM, -48.0, 48.0, 0.0, "");
-		configParam(Tides::FM_PARAM, -12.0, 12.0, 0.0, "");
-		configParam(Tides::SHAPE_PARAM, -1.0, 1.0, 0.0, "");
-		configParam(Tides::SLOPE_PARAM, -1.0, 1.0, 0.0, "");
-		configParam(Tides::SMOOTHNESS_PARAM, -1.0, 1.0, 0.0, "");
+		configParam(Tides::MODE_PARAM, 0.0, 1.0, 0.0, "Output mode");
+		configParam(Tides::RANGE_PARAM, 0.0, 1.0, 0.0, "Frequency range");
+		configParam(Tides::FREQUENCY_PARAM, -48.0, 48.0, 0.0, "Main frequency");
+		configParam(Tides::FM_PARAM, -12.0, 12.0, 0.0, "FM input attenuverter");
+		configParam(Tides::SHAPE_PARAM, -1.0, 1.0, 0.0, "Shape");
+		configParam(Tides::SLOPE_PARAM, -1.0, 1.0, 0.0, "Slope");
+		configParam(Tides::SMOOTHNESS_PARAM, -1.0, 1.0, 0.0, "Smoothness");
 
 		memset(&generator, 0, sizeof(generator));
 		generator.Init();
@@ -229,10 +229,10 @@ struct TidesWidget : ModuleWidget {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Cycles.svg")));
 
-		addChild(createWidget<ScrewSilver>(Vec(15, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(180, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(15, 365)));
-		addChild(createWidget<ScrewSilver>(Vec(180, 365)));
+		// addChild(createWidget<ScrewSilver>(Vec(15, 0)));
+		// addChild(createWidget<ScrewSilver>(Vec(180, 0)));
+		// addChild(createWidget<ScrewSilver>(Vec(15, 365)));
+		// addChild(createWidget<ScrewSilver>(Vec(180, 365)));
 
 		addParam(createParam<CKD6>(Vec(20, 52), module, Tides::MODE_PARAM));
 		addParam(createParam<CKD6>(Vec(20, 93), module, Tides::RANGE_PARAM));
