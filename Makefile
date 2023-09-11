@@ -1,4 +1,4 @@
-FLAGS += -I./parasites -Wno-unused-local-typedefs
+FLAGS += -DTEST -I./parasites -Wno-unused-local-typedefs
 
 SOURCES += $(wildcard src/*.cpp)
 SOURCES += parasites/stmlib/utils/random.cc
