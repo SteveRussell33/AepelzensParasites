@@ -369,9 +369,9 @@ void Tapeworm::process(const ProcessArgs& args) {
 		p->raw_level[0] = clamp(params[LEVEL1_PARAM].getValue(), 0.0f, 1.0f);
 		p->raw_level[1] = clamp(params[LEVEL2_PARAM].getValue(), 0.0f, 1.0f);
 
-		if (inputs[LEVEL1_INPUT].active)
+		if (inputs[LEVEL1_INPUT].isConnected())
 			p->raw_level[0] *= clamp(inputs[LEVEL1_INPUT].getVoltage() / 5.0f, 0.0f, 1.0f);
-		if (inputs[LEVEL2_INPUT].active)
+		if (inputs[LEVEL2_INPUT].isConnected())
 			p->raw_level[1] *= clamp(inputs[LEVEL2_INPUT].getVoltage() / 5.0f, 0.0f, 1.0f);
 
 		//p->raw_algorithm_pot = clampf(params[ALGORITHM_PARAM].getValue() /8.0, 0.0, 1.0);

@@ -175,7 +175,7 @@ void Tides::process(const ProcessArgs& args) {
 		// Sync
 		// Slight deviation from spec here.
 		// Instead of toggling sync by holding the range button, just enable it if the clock port is plugged in.
-		generator.set_sync(inputs[CLOCK_INPUT].active);
+		generator.set_sync(inputs[CLOCK_INPUT].isConnected());
 		generator.FillBuffer();
 #ifdef WAVETABLE_HACK
 		generator.Process(sheep);
