@@ -102,8 +102,8 @@ void Warps::process(const ProcessArgs& args) {
 	if (stateTrigger.process(params[STATE_PARAM].getValue())) {
 		p->carrier_shape = (p->carrier_shape + 1) % 4;
 	}
-	lights[CARRIER_GREEN_LIGHT].value = (p->carrier_shape == 1 || p->carrier_shape == 2) ? 1.0 : 0.0;
-	lights[CARRIER_RED_LIGHT].value = (p->carrier_shape == 2 || p->carrier_shape == 3) ? 1.0 : 0.0;
+	lights[CARRIER_GREEN_LIGHT].setBrightness((p->carrier_shape == 1 || p->carrier_shape == 2) ? 1.0 : 0.0);
+	lights[CARRIER_RED_LIGHT].setBrightness((p->carrier_shape == 2 || p->carrier_shape == 3) ? 1.0 : 0.0);
 
 	// Buffer loop
 	if (++frame >= 60) {
