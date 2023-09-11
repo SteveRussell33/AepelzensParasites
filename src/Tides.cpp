@@ -52,7 +52,7 @@ struct Tides : Module {
 	uint8_t lastGate;
 	dsp::SchmittTrigger modeTrigger;
 	dsp::SchmittTrigger rangeTrigger;
-
+	
 	Tides() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);		
 		configParam(Tides::MODE_PARAM, 0.0, 1.0, 0.0, "");
@@ -183,7 +183,7 @@ void Tides::process(const ProcessArgs& args) {
 	}
 
 	// Level
-	uint16_t level = clamp(inputs[LEVEL_INPUT].normalize(8.0) / 8.0f, 0.0f, 1.0f) * 0xffff;
+	uint16_t level = clamp(inputs[LEVEL_INPUT].getNormalVoltage(8.0) / 8.0f, 0.0f, 1.0f) * 0xffff;
 	if (level < 32)
 		level = 0;
 
@@ -219,119 +219,112 @@ void Tides::process(const ProcessArgs& args) {
 
 	if (sample.flags & tides::FLAG_END_OF_ATTACK)
 		unif *= -1.0;
-	lights[PHASE_GREEN_LIGHT].setBrightnessSmooth(fmaxf(0.0, unif));
-	lights[PHASE_RED_LIGHT].setBrightnessSmooth(fmaxf(0.0, -unif));
+	lights[PHASE_GREEN_LIGHT].setSmoothBrightness(fmaxf(0.0, unif), args.sampleTime);
+	lights[PHASE_RED_LIGHT].setSmoothBrightness(fmaxf(0.0, -unif), args.sampleTime);
 }
 
 
 struct TidesWidget : ModuleWidget {
-	TidesWidget(Tides* module);
-	Menu *createContextMenu() override;
+	TidesWidget(Tides* module) {
+		setModule(module);
+		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Cycles.svg")));
+
+		addChild(createWidget<ScrewSilver>(Vec(15, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(180, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(15, 365)));
+		addChild(createWidget<ScrewSilver>(Vec(180, 365)));
+
+		addParam(createParam<CKD6>(Vec(20, 52), module, Tides::MODE_PARAM));
+		addParam(createParam<CKD6>(Vec(20, 93), module, Tides::RANGE_PARAM));
+
+		addParam(createParam<Rogan3PSGreen>(Vec(78, 60), module, Tides::FREQUENCY_PARAM));
+		addParam(createParam<Rogan1PSGreen>(Vec(156, 66), module, Tides::FM_PARAM));
+
+		addParam(createParam<Rogan1PSWhite>(Vec(13, 155), module, Tides::SHAPE_PARAM));
+		addParam(createParam<Rogan1PSWhite>(Vec(85, 155), module, Tides::SLOPE_PARAM));
+		addParam(createParam<Rogan1PSWhite>(Vec(156, 155), module, Tides::SMOOTHNESS_PARAM));
+
+		addInput(createInput<PJ301MPort>(Vec(21, 219), module, Tides::SHAPE_INPUT));
+		addInput(createInput<PJ301MPort>(Vec(93, 219), module, Tides::SLOPE_INPUT));
+		addInput(createInput<PJ301MPort>(Vec(164, 219), module, Tides::SMOOTHNESS_INPUT));
+
+		addInput(createInput<PJ301MPort>(Vec(21, 274), module, Tides::TRIG_INPUT));
+		addInput(createInput<PJ301MPort>(Vec(57, 274), module, Tides::FREEZE_INPUT));
+		addInput(createInput<PJ301MPort>(Vec(93, 274), module, Tides::PITCH_INPUT));
+		addInput(createInput<PJ301MPort>(Vec(128, 274), module, Tides::FM_INPUT));
+		addInput(createInput<PJ301MPort>(Vec(164, 274), module, Tides::LEVEL_INPUT));
+
+		addInput(createInput<PJ301MPort>(Vec(21, 316), module, Tides::CLOCK_INPUT));
+		addOutput(createOutput<PJ301MPort>(Vec(57, 316), module, Tides::HIGH_OUTPUT));
+		addOutput(createOutput<PJ301MPort>(Vec(93, 316), module, Tides::LOW_OUTPUT));
+		addOutput(createOutput<PJ301MPort>(Vec(128, 316), module, Tides::UNI_OUTPUT));
+		addOutput(createOutput<PJ301MPort>(Vec(164, 316), module, Tides::BI_OUTPUT));
+
+		addChild(createLight<MediumLight<GreenRedLight>>(Vec(57, 61), module, Tides::MODE_GREEN_LIGHT));
+		addChild(createLight<MediumLight<GreenRedLight>>(Vec(57, 82), module, Tides::PHASE_GREEN_LIGHT));
+		addChild(createLight<MediumLight<GreenRedLight>>(Vec(57, 102), module, Tides::RANGE_GREEN_LIGHT));
+	}
+
+	struct TidesSheepItem : MenuItem {
+		Tides *tides;
+		void onAction(const event::Action &e) override {
+			tides->sheep ^= true;
+		}
+		void step() override {
+			rightText = (tides->sheep) ? "✔" : "";
+			MenuItem::step();
+		}
+	};
+
+	struct TidesModeItem : MenuItem {
+		Tides *module;
+		tides::Generator::FeatureMode mode;
+	    void onAction(const event::Action &e) override {
+		    module->generator.feature_mode_ = mode;
+		}
+		void step() override {
+		  rightText = (module->generator.feature_mode_ == mode) ? "✔" : "";
+			MenuItem::step();
+		}
+	};
+
+	struct TidesQuantizerItem : MenuItem {
+		Tides *module;
+		uint8_t quantize_;
+	    void onAction(const event::Action &e) override {
+		    module->quantize = quantize_;
+		}
+		void step() override {
+		  rightText = (module->quantize == quantize_) ? "✔" : "";
+		  MenuItem::step();
+		}
+	};
+
+	void appendContextMenu(Menu* menu) override {
+		Tides *tides = dynamic_cast<Tides*>(this->module);
+		assert(tides);
+
+	#ifdef WAVETABLE_HACK
+		menu->addChild(new MenuSeparator);
+		menu->addChild(construct<TidesSheepItem>(&MenuEntry::text, "Sheep", &TidesSheepItem::tides, tides));
+	#endif
+		menu->addChild(new MenuSeparator);
+		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Mode"));
+		menu->addChild(construct<TidesModeItem>(&TidesModeItem::text, "Original", &TidesModeItem::module, tides, &TidesModeItem::mode, tides::Generator::FEAT_MODE_FUNCTION));
+		menu->addChild(construct<TidesModeItem>(&TidesModeItem::text, "Harmonic", &TidesModeItem::module, tides, &TidesModeItem::mode, tides::Generator::FEAT_MODE_HARMONIC));
+		menu->addChild(construct<TidesModeItem>(&TidesModeItem::text, "Random", &TidesModeItem::module, tides, &TidesModeItem::mode, tides::Generator::FEAT_MODE_RANDOM));
+
+		//Quantizer
+		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Quantizer"));
+		menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "off", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 0));
+		menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "Semitones", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 1));
+		menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "Ionian", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 2));
+		menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "Aeolian", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 3));
+		menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "whole Tones", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 4));
+		menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "Pentatonic Minor", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 5));
+		menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "Pent-3", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 6));
+		menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "Fifths", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 7));
+	}
 };
-
-TidesWidget::TidesWidget(Tides *module) {
-	setModule(module);
-	setPanel(APP->window->loadSvg(assetPlugin(pluginInstance, "res/Cycles.svg")));
-
-	addChild(createWidget<ScrewSilver>(Vec(15, 0)));
-	addChild(createWidget<ScrewSilver>(Vec(180, 0)));
-	addChild(createWidget<ScrewSilver>(Vec(15, 365)));
-	addChild(createWidget<ScrewSilver>(Vec(180, 365)));
-
-	addParam(createParam<CKD6>(Vec(20, 52), module, Tides::MODE_PARAM));
-	addParam(createParam<CKD6>(Vec(20, 93), module, Tides::RANGE_PARAM));
-
-	addParam(createParam<Rogan3PSGreen>(Vec(78, 60), module, Tides::FREQUENCY_PARAM));
-	addParam(createParam<Rogan1PSGreen>(Vec(156, 66), module, Tides::FM_PARAM));
-
-	addParam(createParam<Rogan1PSWhite>(Vec(13, 155), module, Tides::SHAPE_PARAM));
-	addParam(createParam<Rogan1PSWhite>(Vec(85, 155), module, Tides::SLOPE_PARAM));
-	addParam(createParam<Rogan1PSWhite>(Vec(156, 155), module, Tides::SMOOTHNESS_PARAM));
-
-	addInput(createInput<PJ301MPort>(Vec(21, 219), module, Tides::SHAPE_INPUT));
-	addInput(createInput<PJ301MPort>(Vec(93, 219), module, Tides::SLOPE_INPUT));
-	addInput(createInput<PJ301MPort>(Vec(164, 219), module, Tides::SMOOTHNESS_INPUT));
-
-	addInput(createInput<PJ301MPort>(Vec(21, 274), module, Tides::TRIG_INPUT));
-	addInput(createInput<PJ301MPort>(Vec(57, 274), module, Tides::FREEZE_INPUT));
-	addInput(createInput<PJ301MPort>(Vec(93, 274), module, Tides::PITCH_INPUT));
-	addInput(createInput<PJ301MPort>(Vec(128, 274), module, Tides::FM_INPUT));
-	addInput(createInput<PJ301MPort>(Vec(164, 274), module, Tides::LEVEL_INPUT));
-
-	addInput(createInput<PJ301MPort>(Vec(21, 316), module, Tides::CLOCK_INPUT));
-	addOutput(createOutput<PJ301MPort>(Vec(57, 316), module, Tides::HIGH_OUTPUT));
-	addOutput(createOutput<PJ301MPort>(Vec(93, 316), module, Tides::LOW_OUTPUT));
-	addOutput(createOutput<PJ301MPort>(Vec(128, 316), module, Tides::UNI_OUTPUT));
-	addOutput(createOutput<PJ301MPort>(Vec(164, 316), module, Tides::BI_OUTPUT));
-
-	addChild(ModuleLightcreateWidget<MediumLight<GreenRedLight>>(Vec(57, 61), module, Tides::MODE_GREEN_LIGHT));
-	addChild(ModuleLightcreateWidget<MediumLight<GreenRedLight>>(Vec(57, 82), module, Tides::PHASE_GREEN_LIGHT));
-	addChild(ModuleLightcreateWidget<MediumLight<GreenRedLight>>(Vec(57, 102), module, Tides::RANGE_GREEN_LIGHT));
-}
-
-struct TidesSheepItem : MenuItem {
-	Tides *tides;
-	void onAction(EventAction &e) override {
-		tides->sheep ^= true;
-	}
-	void process(const ProcessArgs& args) override {
-		rightText = (tides->sheep) ? "✔" : "";
-		MenuItem::step();
-	}
-};
-
-struct TidesModeItem : MenuItem {
-	Tides *module;
-	tides::Generator::FeatureMode mode;
-    	void onAction(EventAction &e) override {
-	    module->generator.feature_mode_ = mode;
-	}
-	void process(const ProcessArgs& args) override {
-	  rightText = (module->generator.feature_mode_ == mode) ? "✔" : "";
-		MenuItem::step();
-	}
-};
-
-struct TidesQuantizerItem : MenuItem {
-	Tides *module;
-	uint8_t quantize_;
-    	void onAction(EventAction &e) override {
-	    module->quantize = quantize_;
-	}
-	void process(const ProcessArgs& args) override {
-	  rightText = (module->quantize == quantize_) ? "✔" : "";
-	  MenuItem::step();
-	}
-};
-
-
-Menu *TidescreateWidgetContextMenu() {
-	Menu *menu = ModulecreateWidgetContextMenu();
-
-	Tides *tides = dynamic_cast<Tides*>(this->module);
-	assert(tides);
-
-#ifdef WAVETABLE_HACK
-	menu->addChild(construct<MenuEntry>());
-	menu->addChild(construct<TidesSheepItem>(&MenuEntry::text, "Sheep", &TidesSheepItem::tides, tides));
-#endif
-	menu->addChild(construct<MenuLabel>());
-	menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Mode"));
-	menu->addChild(construct<TidesModeItem>(&TidesModeItem::text, "Original", &TidesModeItem::module, tides, &TidesModeItem::mode, tides::Generator::FEAT_MODE_FUNCTION));
-	menu->addChild(construct<TidesModeItem>(&TidesModeItem::text, "Harmonic", &TidesModeItem::module, tides, &TidesModeItem::mode, tides::Generator::FEAT_MODE_HARMONIC));
-	menu->addChild(construct<TidesModeItem>(&TidesModeItem::text, "Random", &TidesModeItem::module, tides, &TidesModeItem::mode, tides::Generator::FEAT_MODE_RANDOM));
-
-	//Quantizer
-	menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Quantizer"));
-	menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "off", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 0));
-	menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "Semitones", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 1));
-	menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "Ionian", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 2));
-	menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "Aeolian", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 3));
-	menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "whole Tones", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 4));
-	menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "Pentatonic Minor", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 5));
-	menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "Pent-3", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 6));
-	menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "Fifths", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 7));
-	return menu;
-}
 
 Model *modelTides = createModel<Tides, TidesWidget>("Tides");

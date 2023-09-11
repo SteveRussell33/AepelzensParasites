@@ -38,6 +38,20 @@ struct Warps : Module {
 	warps::ShortFrame outputFrames[60] = {};
 	dsp::SchmittTrigger stateTrigger;
 
+	// Taken from eurorack\warps\ui.cc
+	const uint8_t algorithm_palette[10][3] = {
+		{ 0, 192, 64 },
+		{ 64, 255, 0 },
+		{ 255, 255, 0 },
+		{ 255, 64, 0 },
+		{ 255, 0, 0 },
+		{ 255, 0, 64 },
+		{ 255, 0, 255 },
+		{ 0, 0, 255 },
+		{ 0, 255, 192 },
+		{ 0, 255, 192 },
+	};
+
 	Warps() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		configParam(Warps::ALGORITHM_PARAM, 0.0, 8.0, 0.0, "");
@@ -126,7 +140,7 @@ void Warps::process(const ProcessArgs& args) {
 		// p->frequency_shift_pot = params[ALGORITHM_PARAM].value / 8.0;
 		// p->frequency_shift_cv = clampf(inputs[ALGORITHM_INPUT].value / 5.0, -1.0, 1.0);
 		// p->phase_shift = p->modulation_algorithm;
-		p->note = 60.0 * params[LEVEL1_PARAM].value + 12.0 * inputs[LEVEL1_INPUT].normalize(2.0) + 12.0;
+		p->note = 60.0 * params[LEVEL1_PARAM].value + 12.0 * inputs[LEVEL1_INPUT].getNormalVoltage(2.0) + 12.0;
 		p->note += log2f(96000.0 / args.sampleRate) * 12.0;
 
 		modulator.Process(inputFrames, outputFrames, 60);
@@ -140,80 +154,75 @@ void Warps::process(const ProcessArgs& args) {
 
 
 struct WarpsWidget : ModuleWidget {
-	WarpsWidget(Warps *module);
-	Menu *createContextMenu() override;
-};
+	WarpsWidget(Warps *module) {
+		setModule(module);
+		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Warps.svg")));
 
-WarpsWidget::WarpsWidget(Warps *module) {
-	setModule(module);
-	setPanel(APP->window->loadSvg(assetPlugin(pluginInstance, "res/Wasp.svg")));
+		addChild(createWidget<ScrewSilver>(Vec(15, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(120, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(15, 365)));
+		addChild(createWidget<ScrewSilver>(Vec(120, 365)));
 
-	addChild(createWidget<ScrewSilver>(Vec(15, 0)));
-	addChild(createWidget<ScrewSilver>(Vec(120, 0)));
-	addChild(createWidget<ScrewSilver>(Vec(15, 365)));
-	addChild(createWidget<ScrewSilver>(Vec(120, 365)));
+		addParam(createParam<Rogan6PSWhite>(Vec(29, 52), module, Warps::ALGORITHM_PARAM));
 
-	addParam(createParam<Rogan6PSWhite>(Vec(29, 52), module, Warps::ALGORITHM_PARAM));
+		addParam(createParam<Rogan1PSWhite>(Vec(94, 173), module, Warps::TIMBRE_PARAM));
+		addParam(createParam<TL1105>(Vec(16, 182), module, Warps::STATE_PARAM));
+		addParam(createParam<Trimpot>(Vec(14, 213), module, Warps::LEVEL1_PARAM));
+		addParam(createParam<Trimpot>(Vec(53, 213), module, Warps::LEVEL2_PARAM));
 
-	addParam(createParam<Rogan1PSWhite>(Vec(94, 173), module, Warps::TIMBRE_PARAM));
-	addParam(createParam<TL1105>(Vec(16, 182), module, Warps::STATE_PARAM));
-	addParam(createParam<Trimpot>(Vec(14, 213), module, Warps::LEVEL1_PARAM));
-	addParam(createParam<Trimpot>(Vec(53, 213), module, Warps::LEVEL2_PARAM));
+		addInput(createInput<PJ301MPort>(Vec(8, 273), module, Warps::LEVEL1_INPUT));
+		addInput(createInput<PJ301MPort>(Vec(44, 273), module, Warps::LEVEL2_INPUT));
+		addInput(createInput<PJ301MPort>(Vec(80, 273), module, Warps::ALGORITHM_INPUT));
+		addInput(createInput<PJ301MPort>(Vec(116, 273), module, Warps::TIMBRE_INPUT));
 
-	addInput(createInput<PJ301MPort>(Vec(8, 273), module, Warps::LEVEL1_INPUT));
-	addInput(createInput<PJ301MPort>(Vec(44, 273), module, Warps::LEVEL2_INPUT));
-	addInput(createInput<PJ301MPort>(Vec(80, 273), module, Warps::ALGORITHM_INPUT));
-	addInput(createInput<PJ301MPort>(Vec(116, 273), module, Warps::TIMBRE_INPUT));
+		addInput(createInput<PJ301MPort>(Vec(8, 316), module, Warps::CARRIER_INPUT));
+		addInput(createInput<PJ301MPort>(Vec(44, 316), module, Warps::MODULATOR_INPUT));
+		addOutput(createOutput<PJ301MPort>(Vec(80, 316), module, Warps::MODULATOR_OUTPUT));
+		addOutput(createOutput<PJ301MPort>(Vec(116, 316), module, Warps::AUX_OUTPUT));
 
-	addInput(createInput<PJ301MPort>(Vec(8, 316), module, Warps::CARRIER_INPUT));
-	addInput(createInput<PJ301MPort>(Vec(44, 316), module, Warps::MODULATOR_INPUT));
-	addOutput(createOutput<PJ301MPort>(Vec(80, 316), module, Warps::MODULATOR_OUTPUT));
-	addOutput(createOutput<PJ301MPort>(Vec(116, 316), module, Warps::AUX_OUTPUT));
+		addChild(createLight<SmallLight<GreenRedLight>>(Vec(20, 167), module, Warps::CARRIER_GREEN_LIGHT));
 
-	addChild(createLight<SmallLight<GreenRedLight>>(Vec(20, 167), module, Warps::CARRIER_GREEN_LIGHT));
-
-	// struct AlgorithmLight : RedGreenBlueLight {
-	// 	AlgorithmLight() {
-	// 		box.size = Vec(71, 71);
-	// 	}
-	// };
-	// addChild(createLight<AlgorithmLight>(Vec(40, 63), module, Warps::ALGORITHM_LIGHT));
-	addChild(createLightCentered<Rogan6PSLight<RedGreenBlueLight>>(Vec(73.556641, 96.560532), module, Warps::ALGORITHM_LIGHT));
-
-}
-
-struct WarpsModeItem : MenuItem {
-	Warps *module;
-	warps::FeatureMode mode;
-	void onAction(EventAction &e) override {
-	  //module->playback = playback;
-	  module->modulator.set_feature_mode(mode);
+		// struct AlgorithmLight : RedGreenBlueLight {
+		// 	AlgorithmLight() {
+		// 		box.size = Vec(71, 71);
+		// 	}
+		// };
+		// addChild(createLight<AlgorithmLight>(Vec(40, 63), module, Warps::ALGORITHM_LIGHT));
+		addChild(createLightCentered<Rogan6PSLight<RedGreenBlueLight>>(Vec(73.556641, 96.560532), module, Warps::ALGORITHM_LIGHT));
 	}
-	void process(const ProcessArgs& args) override {
-	  rightText = (module->modulator.feature_mode() == mode) ? "✔" : "";
-		MenuItem::step();
+
+	struct WarpsModeItem : MenuItem {
+		Warps *module;
+		warps::FeatureMode mode;
+		void onAction(const event::Action &e) override {
+		  //module->playback = playback;
+		  module->modulator.set_feature_mode(mode);
+		}
+		void step() override {
+		  rightText = (module->modulator.feature_mode() == mode) ? "✔" : "";
+			MenuItem::step();
+		}
+	};
+
+	void appendContextMenu(Menu* menu) override {
+		Warps *module = dynamic_cast<Warps*>(this->module);
+		assert(module);
+
+		menu->addChild(new MenuSeparator);
+		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Mode"));
+
+		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Meta", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_META));
+		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Fold", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_FOLD));
+		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Chebyschev", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_CHEBYSCHEV));
+		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Frequency Shifter", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_FREQUENCY_SHIFTER));
+		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Bitcrusher", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_BITCRUSHER));
+		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Comparator", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_COMPARATOR));
+		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Vocoder", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_VOCODER));
+	#ifdef DOPPLER_PANNER
+		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Doppler", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_DOPPLER));
+	#endif
+		//menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Delay", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_DELAY));
 	}
 };
-
-Menu *WarpscreateWidgetContextMenu() {
-  	Menu *menu = ModulecreateWidgetContextMenu();
-	Warps *module = dynamic_cast<Warps*>(this->module);
-
-	menu->addChild(construct<MenuLabel>());
-	menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Mode"));
-
-	menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Meta", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_META));
-	menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Fold", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_FOLD));
-	menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Chebyschev", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_CHEBYSCHEV));
-	menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Frequency Shifter", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_FREQUENCY_SHIFTER));
-	menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Bitcrusher", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_BITCRUSHER));
-	menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Comparator", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_COMPARATOR));
-	menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Vocoder", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_VOCODER));
-#ifdef DOPPLER_PANNER
-	menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Doppler", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_DOPPLER));
-#endif
-	//menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Delay", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_DELAY));
-	return menu;
-}
 
 Model *modelWarps = createModel<Warps, WarpsWidget>("Warps");
