@@ -415,9 +415,7 @@ struct TapewormWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(15, 365)));
 		addChild(createWidget<ScrewSilver>(Vec(120, 365)));
 
-		addParam(createParam<Rogan6PSWhite>(Vec(29, 52), module, Tapeworm::ALGORITHM_PARAM));
-		// addParam(createParamCentered<Rogan6PSWhite>(Vec(73.556641, 96.560532), module, Tapeworm::ALGORITHM_PARAM));
-
+		addParam(createParamCentered<Rogan6PSWhite>(Vec(73.556641, 96.560532), module, Tapeworm::ALGORITHM_PARAM));
 		addParam(createParam<Rogan1PSWhite>(Vec(94, 173), module, Tapeworm::TIMBRE_PARAM));
 		addParam(createParam<TL1105>(Vec(16, 182), module, Tapeworm::STATE_PARAM));
 		addParam(createParam<Trimpot>(Vec(14, 213), module, Tapeworm::LEVEL1_PARAM));
@@ -427,21 +425,14 @@ struct TapewormWidget : ModuleWidget {
 		addInput(createInput<PJ301MPort>(Vec(44, 273), module, Tapeworm::LEVEL2_INPUT));
 		addInput(createInput<PJ301MPort>(Vec(80, 273), module, Tapeworm::ALGORITHM_INPUT));
 		addInput(createInput<PJ301MPort>(Vec(116, 273), module, Tapeworm::TIMBRE_INPUT));
-
 		addInput(createInput<PJ301MPort>(Vec(8, 316), module, Tapeworm::CARRIER_INPUT));
 		addInput(createInput<PJ301MPort>(Vec(44, 316), module, Tapeworm::MODULATOR_INPUT));
+
 		addOutput(createOutput<PJ301MPort>(Vec(80, 316), module, Tapeworm::MODULATOR_OUTPUT));
 		addOutput(createOutput<PJ301MPort>(Vec(116, 316), module, Tapeworm::AUX_OUTPUT));
 
 		addChild(createLight<SmallLight<GreenRedLight>>(Vec(20, 167), module, Tapeworm::CARRIER_GREEN_LIGHT));
-
-		struct AlgorithmLight : RedGreenBlueLight {
-			AlgorithmLight() {
-				box.size = Vec(71, 71);
-			}
-		};
-		addChild(createLight<AlgorithmLight>(Vec(40, 63), module, Tapeworm::ALGORITHM_LIGHT));
-		// addChild(createLightCentered<Rogan6PSLight<RedGreenBlueLight>>(Vec(73.556641, 96.560532), module, Tapeworm::ALGORITHM_LIGHT));
+		addChild(createLightCentered<Rogan6PSLight<RedGreenBlueLight>>(Vec(73.556641, 96.560532), module, Tapeworm::ALGORITHM_LIGHT));
 	}
 };
 
