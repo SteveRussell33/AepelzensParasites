@@ -109,8 +109,11 @@ void Warps::process(const ProcessArgs& args) {
 	if (++frame >= 60) {
 		frame = 0;
 
-		p->channel_drive[0] = clamp(params[LEVEL1_PARAM].getValue() + inputs[LEVEL1_INPUT].getVoltage() / 5.0f, 0.0f, 1.0f);
-		p->channel_drive[1] = clamp(params[LEVEL2_PARAM].getValue() + inputs[LEVEL2_INPUT].getVoltage() / 5.0f, 0.0f, 1.0f);
+		// Normal Warps' level inputs to 5v and make pots attenuate to match hardware and manual
+		// https://github.com/VCVRack/AudibleInstruments/pull/107
+		p->channel_drive[0] = clamp(params[LEVEL1_PARAM].getValue() * inputs[LEVEL1_INPUT].getNormalVoltage(5.0f) / 5.0f, 0.0f, 1.0f);
+		p->channel_drive[1] = clamp(params[LEVEL2_PARAM].getValue() * inputs[LEVEL2_INPUT].getNormalVoltage(5.0f) / 5.0f, 0.0f, 1.0f);
+
 		p->modulation_algorithm = clamp(params[ALGORITHM_PARAM].getValue() / 8.0 + inputs[ALGORITHM_INPUT].getVoltage() / 5.0f, 0.0f, 1.0f);
 		p->raw_level[0] = clamp(params[LEVEL1_PARAM].getValue(), 0.0f, 1.0f);
 		p->raw_level[1] = clamp(params[LEVEL2_PARAM].getValue(), 0.0f, 1.0f);
@@ -140,6 +143,8 @@ void Warps::process(const ProcessArgs& args) {
 		// p->frequency_shift_pot = params[ALGORITHM_PARAM].getValue() / 8.0;
 		// p->frequency_shift_cv = clampf(inputs[ALGORITHM_INPUT].getVoltage() / 5.0, -1.0, 1.0);
 		// p->phase_shift = p->modulation_algorithm;
+
+		// level 1 pot still operates additively with level 1 cv for controlling the frequency of the internal oscillator
 		p->note = 60.0 * params[LEVEL1_PARAM].getValue() + 12.0 * inputs[LEVEL1_INPUT].getNormalVoltage(2.0) + 12.0;
 		p->note += log2f(96000.0 / args.sampleRate) * 12.0;
 
