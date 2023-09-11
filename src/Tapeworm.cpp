@@ -355,7 +355,7 @@ void Tapeworm::ProcessDelay(warps::ShortFrame* input, warps::ShortFrame* output,
 void Tapeworm::process(const ProcessArgs& args) {
 	// State trigger
 	warps::Parameters *p = &parameters_;
-	if (stateTrigger.process(params[STATE_PARAM].value)) {
+	if (stateTrigger.process(params[STATE_PARAM].getValue())) {
 		p->carrier_shape = (p->carrier_shape + 1) % 4;
 	}
 	lights[CARRIER_GREEN_LIGHT].value = (p->carrier_shape == 1 || p->carrier_shape == 2) ? 1.0 : 0.0;
@@ -365,23 +365,23 @@ void Tapeworm::process(const ProcessArgs& args) {
 	if (++frame >= 60) {
 		frame = 0;
 
-		p->modulation_algorithm = clamp(params[ALGORITHM_PARAM].value / 8.0f + inputs[ALGORITHM_INPUT].value / 5.0f, 0.0f, 1.0f);
-		p->raw_level[0] = clamp(params[LEVEL1_PARAM].value, 0.0f, 1.0f);
-		p->raw_level[1] = clamp(params[LEVEL2_PARAM].value, 0.0f, 1.0f);
+		p->modulation_algorithm = clamp(params[ALGORITHM_PARAM].getValue() / 8.0f + inputs[ALGORITHM_INPUT].getVoltage() / 5.0f, 0.0f, 1.0f);
+		p->raw_level[0] = clamp(params[LEVEL1_PARAM].getValue(), 0.0f, 1.0f);
+		p->raw_level[1] = clamp(params[LEVEL2_PARAM].getValue(), 0.0f, 1.0f);
 
 		if (inputs[LEVEL1_INPUT].active)
-			p->raw_level[0] *= clamp(inputs[LEVEL1_INPUT].value / 5.0f, 0.0f, 1.0f);
+			p->raw_level[0] *= clamp(inputs[LEVEL1_INPUT].getVoltage() / 5.0f, 0.0f, 1.0f);
 		if (inputs[LEVEL2_INPUT].active)
-			p->raw_level[1] *= clamp(inputs[LEVEL2_INPUT].value / 5.0f, 0.0f, 1.0f);
+			p->raw_level[1] *= clamp(inputs[LEVEL2_INPUT].getVoltage() / 5.0f, 0.0f, 1.0f);
 
-		//p->raw_algorithm_pot = clampf(params[ALGORITHM_PARAM].value /8.0, 0.0, 1.0);
-		// float val = clampf(params[ALGORITHM_PARAM].value /8.0, 0.0, 1.0);
+		//p->raw_algorithm_pot = clampf(params[ALGORITHM_PARAM].getValue() /8.0, 0.0, 1.0);
+		// float val = clampf(params[ALGORITHM_PARAM].getValue() /8.0, 0.0, 1.0);
 		// val = stmlib::Interpolate(warps::lut_pot_curve, val, 512.0f);
 		// p->raw_algorithm_pot = val;
 
-		//p->raw_algorithm_cv = clampf(inputs[ALGORITHM_INPUT].value /5.0, -1.0,1.0);
+		//p->raw_algorithm_cv = clampf(inputs[ALGORITHM_INPUT].getVoltage() /5.0, -1.0,1.0);
 		//According to the cv-scaler this does not seem to use the plot curve
-		p->raw_algorithm = clamp(params[ALGORITHM_PARAM].value / 8.0f + inputs[ALGORITHM_INPUT].value / 5.0f, 0.0f, 1.0f);
+		p->raw_algorithm = clamp(params[ALGORITHM_PARAM].getValue() / 8.0f + inputs[ALGORITHM_INPUT].getVoltage() / 5.0f, 0.0f, 1.0f);
 		{
 			// Taken from eurorack\warps\ui.cc
 			float zone = 8.0f * p->modulation_algorithm;
@@ -394,14 +394,14 @@ void Tapeworm::process(const ProcessArgs& args) {
             }
 		}
 
-		p->modulation_parameter = clamp(params[TIMBRE_PARAM].value + inputs[TIMBRE_INPUT].value / 5.0f, 0.0f, 1.0f);
+		p->modulation_parameter = clamp(params[TIMBRE_PARAM].getValue() + inputs[TIMBRE_INPUT].getVoltage() / 5.0f, 0.0f, 1.0f);
 		ProcessDelay(inputFrames, outputFrames, 60);
 	}
 
-	inputFrames[frame].l = clamp((int) (inputs[CARRIER_INPUT].value / 16.0 * 0x8000), -0x8000, 0x7fff);
-	inputFrames[frame].r = clamp((int) (inputs[MODULATOR_INPUT].value / 16.0 * 0x8000), -0x8000, 0x7fff);
-	outputs[MODULATOR_OUTPUT].value = (float)outputFrames[frame].l / 0x8000 * 5.0;
-	outputs[AUX_OUTPUT].value = (float)outputFrames[frame].r / 0x8000 * 5.0;
+	inputFrames[frame].l = clamp((int) (inputs[CARRIER_INPUT].getVoltage() / 16.0 * 0x8000), -0x8000, 0x7fff);
+	inputFrames[frame].r = clamp((int) (inputs[MODULATOR_INPUT].getVoltage() / 16.0 * 0x8000), -0x8000, 0x7fff);
+	outputs[MODULATOR_OUTPUT].setVoltage((float)outputFrames[frame].l / 0x8000 * 5.0);
+	outputs[AUX_OUTPUT].setVoltage((float)outputFrames[frame].r / 0x8000 * 5.0);
 }
 
 

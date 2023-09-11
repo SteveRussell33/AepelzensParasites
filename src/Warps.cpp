@@ -99,7 +99,7 @@ struct Warps : Module {
 void Warps::process(const ProcessArgs& args) {
 	// State trigger
 	warps::Parameters* p = modulator.mutable_parameters();
-	if (stateTrigger.process(params[STATE_PARAM].value)) {
+	if (stateTrigger.process(params[STATE_PARAM].getValue())) {
 		p->carrier_shape = (p->carrier_shape + 1) % 4;
 	}
 	lights[CARRIER_GREEN_LIGHT].value = (p->carrier_shape == 1 || p->carrier_shape == 2) ? 1.0 : 0.0;
@@ -109,20 +109,20 @@ void Warps::process(const ProcessArgs& args) {
 	if (++frame >= 60) {
 		frame = 0;
 
-		p->channel_drive[0] = clamp(params[LEVEL1_PARAM].value + inputs[LEVEL1_INPUT].value / 5.0f, 0.0f, 1.0f);
-		p->channel_drive[1] = clamp(params[LEVEL2_PARAM].value + inputs[LEVEL2_INPUT].value / 5.0f, 0.0f, 1.0f);
-		p->modulation_algorithm = clamp(params[ALGORITHM_PARAM].value / 8.0 + inputs[ALGORITHM_INPUT].value / 5.0f, 0.0f, 1.0f);
-		p->raw_level[0] = clamp(params[LEVEL1_PARAM].value, 0.0f, 1.0f);
-		p->raw_level[1] = clamp(params[LEVEL2_PARAM].value, 0.0f, 1.0f);
+		p->channel_drive[0] = clamp(params[LEVEL1_PARAM].getValue() + inputs[LEVEL1_INPUT].getVoltage() / 5.0f, 0.0f, 1.0f);
+		p->channel_drive[1] = clamp(params[LEVEL2_PARAM].getValue() + inputs[LEVEL2_INPUT].getVoltage() / 5.0f, 0.0f, 1.0f);
+		p->modulation_algorithm = clamp(params[ALGORITHM_PARAM].getValue() / 8.0 + inputs[ALGORITHM_INPUT].getVoltage() / 5.0f, 0.0f, 1.0f);
+		p->raw_level[0] = clamp(params[LEVEL1_PARAM].getValue(), 0.0f, 1.0f);
+		p->raw_level[1] = clamp(params[LEVEL2_PARAM].getValue(), 0.0f, 1.0f);
 
-		//p->raw_algorithm_pot = clampf(params[ALGORITHM_PARAM].value /8.0, 0.0, 1.0);
-		float val = clamp(params[ALGORITHM_PARAM].value /8.0f, 0.0f, 1.0f);
+		//p->raw_algorithm_pot = clampf(params[ALGORITHM_PARAM].getValue() /8.0, 0.0, 1.0);
+		float val = clamp(params[ALGORITHM_PARAM].getValue() /8.0f, 0.0f, 1.0f);
 		val = stmlib::Interpolate(warps::lut_pot_curve, val, 512.0f);
 		p->raw_algorithm_pot = val;
 
-		p->raw_algorithm_cv = clamp(inputs[ALGORITHM_INPUT].value /5.0f, -1.0f,1.0f);
+		p->raw_algorithm_cv = clamp(inputs[ALGORITHM_INPUT].getVoltage() /5.0f, -1.0f,1.0f);
 		//According to the cv-scaler this does not seem to use the plot curve
-		p->raw_algorithm = clamp(params[ALGORITHM_PARAM].value /8.0f + inputs[ALGORITHM_INPUT].value /5.0f, 0.0f, 1.0f);
+		p->raw_algorithm = clamp(params[ALGORITHM_PARAM].getValue() /8.0f + inputs[ALGORITHM_INPUT].getVoltage() /5.0f, 0.0f, 1.0f);
 		{
 			// Taken from eurorack\warps\ui.cc
 			float zone = 8.0f * p->modulation_algorithm;
@@ -135,21 +135,21 @@ void Warps::process(const ProcessArgs& args) {
             }
 		}
 
-		p->modulation_parameter = clamp(params[TIMBRE_PARAM].value + inputs[TIMBRE_INPUT].value / 5.0f, 0.0f, 1.0f);
+		p->modulation_parameter = clamp(params[TIMBRE_PARAM].getValue() + inputs[TIMBRE_INPUT].getVoltage() / 5.0f, 0.0f, 1.0f);
 
-		// p->frequency_shift_pot = params[ALGORITHM_PARAM].value / 8.0;
-		// p->frequency_shift_cv = clampf(inputs[ALGORITHM_INPUT].value / 5.0, -1.0, 1.0);
+		// p->frequency_shift_pot = params[ALGORITHM_PARAM].getValue() / 8.0;
+		// p->frequency_shift_cv = clampf(inputs[ALGORITHM_INPUT].getVoltage() / 5.0, -1.0, 1.0);
 		// p->phase_shift = p->modulation_algorithm;
-		p->note = 60.0 * params[LEVEL1_PARAM].value + 12.0 * inputs[LEVEL1_INPUT].getNormalVoltage(2.0) + 12.0;
+		p->note = 60.0 * params[LEVEL1_PARAM].getValue() + 12.0 * inputs[LEVEL1_INPUT].getNormalVoltage(2.0) + 12.0;
 		p->note += log2f(96000.0 / args.sampleRate) * 12.0;
 
 		modulator.Process(inputFrames, outputFrames, 60);
 	}
 
-	inputFrames[frame].l = clamp((int) (inputs[CARRIER_INPUT].value / 16.0 * 0x8000), -0x8000, 0x7fff);
-	inputFrames[frame].r = clamp((int) (inputs[MODULATOR_INPUT].value / 16.0 * 0x8000), -0x8000, 0x7fff);
-	outputs[MODULATOR_OUTPUT].value = (float)outputFrames[frame].l / 0x8000 * 5.0;
-	outputs[AUX_OUTPUT].value = (float)outputFrames[frame].r / 0x8000 * 5.0;
+	inputFrames[frame].l = clamp((int) (inputs[CARRIER_INPUT].getVoltage() / 16.0 * 0x8000), -0x8000, 0x7fff);
+	inputFrames[frame].r = clamp((int) (inputs[MODULATOR_INPUT].getVoltage() / 16.0 * 0x8000), -0x8000, 0x7fff);
+	outputs[MODULATOR_OUTPUT].setVoltage((float)outputFrames[frame].l / 0x8000 * 5.0);
+	outputs[AUX_OUTPUT].setVoltage((float)outputFrames[frame].r / 0x8000 * 5.0);
 }
 
 
