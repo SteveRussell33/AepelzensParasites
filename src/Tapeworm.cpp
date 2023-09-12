@@ -34,9 +34,9 @@ struct Tapeworm : Module {
 	};
 
 	int frame = 0;
-	warps::Modulator modulator;
-	warps::ShortFrame inputFrames[60] = {};
-	warps::ShortFrame outputFrames[60] = {};
+	warps::Modulator modulator {};
+	warps::ShortFrame inputFrames[60] {};
+	warps::ShortFrame outputFrames[60] {};
 	dsp::SchmittTrigger stateTrigger;
 
 	//Parasites variables
@@ -101,7 +101,6 @@ struct Tapeworm : Module {
 		configParam(Tapeworm::LEVEL1_PARAM, 0.0, 1.0, 1.0, "External oscillator amplitude / internal oscillator frequency");
 		configParam(Tapeworm::LEVEL2_PARAM, 0.0, 1.0, 1.0, "Modulator amplitude");
 
-		// memset(&modulator, 0, sizeof(modulator));
 		// modulator.Init(96000.0f);
 		delay_interpolation_ = INTERPOLATION_HERMITE;
 	}
@@ -115,7 +114,7 @@ struct Tapeworm : Module {
 		return rootJ;
 	}
 
-	void dataFromJson(json_t *rootJ) override {
+	void dataFromJson(json_t* rootJ) override {
 		if (json_t* shapeJ = json_object_get(rootJ, "shape")) {
 			parameters_.carrier_shape = json_integer_value(shapeJ);
 		}
@@ -353,7 +352,7 @@ void Tapeworm::ProcessDelay(warps::ShortFrame* input, warps::ShortFrame* output,
 
 void Tapeworm::process(const ProcessArgs& args) {
 	// State trigger
-	warps::Parameters *p = &parameters_;
+	warps::Parameters* p = &parameters_;
 	if (stateTrigger.process(params[STATE_PARAM].getValue())) {
 		p->carrier_shape = (p->carrier_shape + 1) % 4;
 	}

@@ -45,7 +45,7 @@ struct Tides : Module {
 
 	const int16_t kOctave = 12 * 128;
 	bool sheep;
-	tides::Generator generator;
+	tides::Generator generator {};
 	uint8_t quantize = 0;
 	int frame = 0;
 	uint8_t lastGate;
@@ -62,7 +62,6 @@ struct Tides : Module {
 		configParam(Tides::SLOPE_PARAM, -1.0, 1.0, 0.0, "Slope");
 		configParam(Tides::SMOOTHNESS_PARAM, -1.0, 1.0, 0.0, "Smoothness");
 
-		memset(&generator, 0, sizeof(generator));
 		generator.Init();
 		generator.set_sync(false);
 		onReset();

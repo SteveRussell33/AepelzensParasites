@@ -32,9 +32,9 @@ struct Warps : Module {
 	};
 
 	int frame = 0;
-	warps::Modulator modulator;
-	warps::ShortFrame inputFrames[60] = {};
-	warps::ShortFrame outputFrames[60] = {};
+	warps::Modulator modulator {};
+	warps::ShortFrame inputFrames[60] {};
+	warps::ShortFrame outputFrames[60] {};
 	dsp::SchmittTrigger stateTrigger;
 
 	// Taken from eurorack\warps\ui.cc
@@ -59,7 +59,6 @@ struct Warps : Module {
 		configParam(Warps::LEVEL1_PARAM, 0.0, 1.0, 1.0, "External oscillator amplitude / internal oscillator frequency");
 		configParam(Warps::LEVEL2_PARAM, 0.0, 1.0, 1.0, "Modulator amplitude");
 
-		memset(&modulator, 0, sizeof(modulator));
 		modulator.Init(96000.0f);
 	}
 	
@@ -78,7 +77,7 @@ struct Warps : Module {
 		if (json_t* shapeJ = json_object_get(rootJ, "shape")) {
 			p->carrier_shape = json_integer_value(shapeJ);
 		}
-		if (json_t *modeJ = json_object_get(rootJ, "mode")) {
+		if (json_t* modeJ = json_object_get(rootJ, "mode")) {
 		  	modulator.set_feature_mode((warps::FeatureMode)json_integer_value(modeJ));
 		}
 	}
@@ -158,7 +157,7 @@ void Warps::process(const ProcessArgs& args) {
 
 
 struct WarpsWidget : ModuleWidget {
-	WarpsWidget(Warps *module) {
+	WarpsWidget(Warps* module) {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Warps.svg")));
 
@@ -188,7 +187,7 @@ struct WarpsWidget : ModuleWidget {
 	}
 
 	struct WarpsModeItem : MenuItem {
-		Warps *module;
+		Warps* module;
 		warps::FeatureMode mode;
 		void onAction(const event::Action &e) override {
 			//module->playback = playback;
@@ -201,7 +200,7 @@ struct WarpsWidget : ModuleWidget {
 	};
 
 	void appendContextMenu(Menu* menu) override {
-		Warps *module = dynamic_cast<Warps*>(this->module);
+		Warps* module = dynamic_cast<Warps*>(this->module);
 		assert(module);
 
 		menu->addChild(new MenuSeparator);
