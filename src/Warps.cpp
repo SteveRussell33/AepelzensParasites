@@ -159,7 +159,7 @@ void Warps::process(const ProcessArgs& args) {
 struct WarpsWidget : ModuleWidget {
 	WarpsWidget(Warps* module) {
 		setModule(module);
-		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Warps.svg")));
+		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Wasp.svg")));
 
 		addChild(createWidget<ScrewSilver>(Vec(15, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(120, 0)));
