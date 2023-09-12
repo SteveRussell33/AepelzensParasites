@@ -214,9 +214,9 @@ struct WarpsWidget : ModuleWidget {
 		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Bitcrusher", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_BITCRUSHER));
 		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Comparator", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_COMPARATOR));
 		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Vocoder", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_VOCODER));
-	#ifdef DOPPLER_PANNER
+	// #ifdef DOPPLER_PANNER
 		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Doppler", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_DOPPLER));
-	#endif
+	// #endif
 		//menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Delay", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_DELAY));
 	}
 };
