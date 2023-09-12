@@ -2,6 +2,8 @@
 #include "warps/dsp/modulator.h"
 #include "warps/resources.h"
 
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
+
 struct Warps : Module {
 	enum ParamIds {
 		ALGORITHM_PARAM,
@@ -32,7 +34,7 @@ struct Warps : Module {
 	};
 
 	int frame = 0;
-	warps::Modulator modulator {};
+	warps::Modulator modulator;
 	warps::ShortFrame inputFrames[60] {};
 	warps::ShortFrame outputFrames[60] {};
 	dsp::SchmittTrigger stateTrigger;
@@ -59,6 +61,7 @@ struct Warps : Module {
 		configParam(Warps::LEVEL1_PARAM, 0.0, 1.0, 1.0, "External oscillator amplitude / internal oscillator frequency");
 		configParam(Warps::LEVEL2_PARAM, 0.0, 1.0, 1.0, "Modulator amplitude");
 
+		memset(&modulator, 0, sizeof(modulator));
 		modulator.Init(96000.0f);
 	}
 	
