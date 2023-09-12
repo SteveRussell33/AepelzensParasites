@@ -164,10 +164,10 @@ struct WarpsWidget : ModuleWidget {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Wasp.svg")));
 
-		addChild(createWidget<ScrewSilver>(Vec(15, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(120, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(15, 365)));
-		addChild(createWidget<ScrewSilver>(Vec(120, 365)));
+		// addChild(createWidget<ScrewSilver>(Vec(15, 0)));
+		// addChild(createWidget<ScrewSilver>(Vec(120, 0)));
+		// addChild(createWidget<ScrewSilver>(Vec(15, 365)));
+		// addChild(createWidget<ScrewSilver>(Vec(120, 365)));
 
 		addParam(createParamCentered<Rogan6PSWhite>(Vec(73.556641, 96.560532), module, Warps::ALGORITHM_PARAM));
 		addParam(createParam<Rogan1PSWhite>(Vec(94, 173), module, Warps::TIMBRE_PARAM));
