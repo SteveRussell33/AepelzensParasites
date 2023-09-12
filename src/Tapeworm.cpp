@@ -430,7 +430,7 @@ struct TapewormWidget : ModuleWidget {
 		addOutput(createOutput<PJ301MPort>(Vec(80, 316), module, Tapeworm::MODULATOR_OUTPUT));
 		addOutput(createOutput<PJ301MPort>(Vec(116, 316), module, Tapeworm::AUX_OUTPUT));
 
-		addChild(createLight<SmallLight<GreenRedLight>>(Vec(20, 167), module, Tapeworm::CARRIER_GREEN_LIGHT));
+		addChild(createLight<SmallLight<GreenRedLight>>(Vec(21, 167), module, Tapeworm::CARRIER_GREEN_LIGHT));
 		addChild(createLightCentered<Rogan6PSLight<RedGreenBlueLight>>(Vec(73.556641, 96.560532), module, Tapeworm::ALGORITHM_LIGHT));
 	}
 };
