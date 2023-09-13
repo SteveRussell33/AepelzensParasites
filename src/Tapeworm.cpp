@@ -100,6 +100,18 @@ struct Tapeworm : Module {
 		configParam(Tapeworm::STATE_PARAM, 0.0, 1.0, 0.0, "Internal oscillator mode");
 		configParam(Tapeworm::LEVEL1_PARAM, 0.0, 1.0, 1.0, "External oscillator amplitude / internal oscillator frequency");
 		configParam(Tapeworm::LEVEL2_PARAM, 0.0, 1.0, 1.0, "Modulator amplitude");
+		
+		configInput(LEVEL1_INPUT, "Level 1");
+		configInput(LEVEL2_INPUT, "Level 2");
+		configInput(ALGORITHM_INPUT, "Algorithm");
+		configInput(TIMBRE_INPUT, "Timbre");
+		configInput(CARRIER_INPUT, "Carrier");
+		configInput(MODULATOR_INPUT, "Modulator");
+
+		configOutput(MODULATOR_OUTPUT, "Modulator");
+		configOutput(AUX_OUTPUT, "Auxiliary");
+
+		configBypass(MODULATOR_INPUT, MODULATOR_OUTPUT);
 
 		// modulator.Init(96000.0f);
 		delay_interpolation_ = INTERPOLATION_HERMITE;

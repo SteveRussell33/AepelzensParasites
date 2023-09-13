@@ -61,6 +61,18 @@ struct Warps : Module {
 		configParam(Warps::LEVEL1_PARAM, 0.0, 1.0, 1.0, "External oscillator amplitude / internal oscillator frequency");
 		configParam(Warps::LEVEL2_PARAM, 0.0, 1.0, 1.0, "Modulator amplitude");
 
+		configInput(LEVEL1_INPUT, "Level 1");
+		configInput(LEVEL2_INPUT, "Level 2");
+		configInput(ALGORITHM_INPUT, "Algorithm");
+		configInput(TIMBRE_INPUT, "Timbre");
+		configInput(CARRIER_INPUT, "Carrier");
+		configInput(MODULATOR_INPUT, "Modulator");
+
+		configOutput(MODULATOR_OUTPUT, "Modulator");
+		configOutput(AUX_OUTPUT, "Auxiliary");
+
+		configBypass(MODULATOR_INPUT, MODULATOR_OUTPUT);
+
 		memset(&modulator, 0, sizeof(modulator));
 		modulator.Init(96000.0f);
 	}
@@ -209,15 +221,15 @@ struct WarpsWidget : ModuleWidget {
 		menu->addChild(new MenuSeparator);
 		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Mode"));
 
-		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Meta", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_META));
-		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Fold", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_FOLD));
-		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Chebyschev", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_CHEBYSCHEV));
-		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Frequency Shifter", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_FREQUENCY_SHIFTER));
-		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Bitcrusher", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_BITCRUSHER));
-		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Comparator", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_COMPARATOR));
+		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Meta (main function)", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_META));
+		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Wavefolder", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_FOLD));
+		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Chebyschev (waveshaper)", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_CHEBYSCHEV));
+		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Frequency Shifter (easter egg)", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_FREQUENCY_SHIFTER));
+		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Dual Bitcrusher", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_BITCRUSHER));
+		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Comparator + Chebyschev", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_COMPARATOR));
 		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Vocoder", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_VOCODER));
 	// #ifdef DOPPLER_PANNER
-		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Doppler", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_DOPPLER));
+		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Binaural Doppler [1 instance] ", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_DOPPLER));
 	// #endif
 		//menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Delay", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_DELAY));
 	}

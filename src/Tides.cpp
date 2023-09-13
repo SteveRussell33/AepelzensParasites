@@ -64,6 +64,21 @@ struct Tides : Module {
 		configParam(Tides::SLOPE_PARAM, -1.0, 1.0, 0.0, "Slope");
 		configParam(Tides::SMOOTHNESS_PARAM, -1.0, 1.0, 0.0, "Smoothness");
 		
+		configInput(SHAPE_INPUT, "Shape");
+		configInput(SLOPE_INPUT, "Slope");
+		configInput(SMOOTHNESS_INPUT, "Smoothness");
+		configInput(TRIG_INPUT, "Trigger");
+		configInput(FREEZE_INPUT, "Freeze");
+		configInput(PITCH_INPUT, "Pitch (1V/oct)");
+		configInput(FM_INPUT, "FM");
+		configInput(LEVEL_INPUT, "Level");
+		configInput(CLOCK_INPUT, "Clock");
+
+		configOutput(HIGH_OUTPUT, "High tide");
+		configOutput(LOW_OUTPUT, "Low tide");
+		configOutput(UNI_OUTPUT, "Unipolar");
+		configOutput(BI_OUTPUT, "Bipolar");
+
 		memset(&generator, 0, sizeof(generator));
 		generator.Init();
 		generator.set_sync(false);
@@ -315,13 +330,12 @@ struct TidesWidget : ModuleWidget {
 		menu->addChild(construct<TidesModeItem>(&TidesModeItem::text, "Harmonic", &TidesModeItem::module, tides, &TidesModeItem::mode, tides::Generator::FEAT_MODE_HARMONIC));
 		menu->addChild(construct<TidesModeItem>(&TidesModeItem::text, "Random", &TidesModeItem::module, tides, &TidesModeItem::mode, tides::Generator::FEAT_MODE_RANDOM));
 
-		//Quantizer
 		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Quantizer"));
-		menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "off", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 0));
+		menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "Off", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 0));
 		menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "Semitones", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 1));
 		menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "Ionian", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 2));
 		menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "Aeolian", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 3));
-		menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "whole Tones", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 4));
+		menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "Whole tones", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 4));
 		menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "Pentatonic Minor", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 5));
 		menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "Pent-3", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 6));
 		menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "Fifths", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 7));
