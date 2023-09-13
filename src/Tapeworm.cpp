@@ -396,10 +396,10 @@ void Tapeworm::process(const ProcessArgs& args) {
 		ProcessDelay(inputFrames, outputFrames, 60);
 	}
 
-	inputFrames[frame].l = clamp(static_cast<int>((inputs[CARRIER_INPUT].getVoltage() / 16.0 * 0x8000), -0x8000, 0x7fff));
-	inputFrames[frame].r = clamp(static_cast<int>((inputs[MODULATOR_INPUT].getVoltage() / 16.0 * 0x8000), -0x8000, 0x7fff));
-	outputs[MODULATOR_OUTPUT].setVoltage(static_cast<float>(outputFrames[frame].l / 0x8000 * 5.0));
-	outputs[AUX_OUTPUT].setVoltage(static_cast<float>(outputFrames[frame].r / 0x8000 * 5.0));
+	inputFrames[frame].l = clamp(static_cast<int>((inputs[CARRIER_INPUT].getVoltage() / 16.0 * 0x8000)), -0x8000, 0x7fff);
+	inputFrames[frame].r = clamp(static_cast<int>((inputs[MODULATOR_INPUT].getVoltage() / 16.0 * 0x8000)), -0x8000, 0x7fff);
+	outputs[MODULATOR_OUTPUT].setVoltage(static_cast<float>(outputFrames[frame].l) / 0x8000 * 5.0);
+	outputs[AUX_OUTPUT].setVoltage(static_cast<float>(outputFrames[frame].r) / 0x8000 * 5.0);
 }
 
 
