@@ -228,7 +228,7 @@ void Tides::process(const ProcessArgs& args) {
 struct TidesWidget : ModuleWidget {
 	TidesWidget(Tides* module) {
 		setModule(module);
-		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Cycles.svg")));
+		setPanel(createPanel(asset::plugin(pluginInstance, "res/Cycles.svg")));
 
 		// addChild(createWidget<ScrewSilver>(Vec(15, 0)));
 		// addChild(createWidget<ScrewSilver>(Vec(180, 0)));

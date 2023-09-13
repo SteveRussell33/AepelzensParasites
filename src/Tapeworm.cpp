@@ -406,7 +406,7 @@ void Tapeworm::process(const ProcessArgs& args) {
 struct TapewormWidget : ModuleWidget {
 	TapewormWidget(Tapeworm* module) {
 		setModule(module);
-		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Tapeworm.svg")));
+		setPanel(createPanel(asset::plugin(pluginInstance, "res/Tapeworm.svg")));
 
 		// addChild(createWidget<ScrewSilver>(Vec(15, 0)));
 		// addChild(createWidget<ScrewSilver>(Vec(120, 0)));
