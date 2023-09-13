@@ -945,7 +945,7 @@ uint16_t ComputePeak(uint16_t center, uint16_t width, uint16_t x) {
   return peak;
 }
 
-template<GeneratorMode mode>
+template<GeneratorMode gmode>
 void Generator::FillBufferHarmonic() {
 
   uint8_t size = kBlockSize;
@@ -975,7 +975,7 @@ void Generator::FillBufferHarmonic() {
 
   // pre-compute spectral envelope
   for (uint8_t harm=0; harm<kNumHarmonics; harm++) {
-    uint16_t x = mode == GENERATOR_MODE_AR ?
+    uint16_t x = gmode == GENERATOR_MODE_AR ?
       (harm << 16) / kNumHarmonicsPowers :
       (harm << 16) / kNumHarmonics;
 
@@ -996,9 +996,9 @@ void Generator::FillBufferHarmonic() {
 
     uint32_t pi = abs(phase_increment_end) >> 16;
     pi =
-      mode == GENERATOR_MODE_AR ? pi << harm :
-      mode == GENERATOR_MODE_LOOPING ? pi * (harm + 1) :
-      // mode == GENERATOR_MODE_AD ?
+      gmode == GENERATOR_MODE_AR ? pi << harm :
+      gmode == GENERATOR_MODE_LOOPING ? pi * (harm + 1) :
+      // gmode == GENERATOR_MODE_AD ?
       pi * ((harm << 1) + 1);
 
     if (pi > kCutoffHigh)
@@ -1090,13 +1090,13 @@ void Generator::FillBufferHarmonic() {
       unipolar += (((tn * envelope_[harm_permut_[harm]]) >> 16) * antialias[harm]) >> 16;
 
       int32_t t = tn;
-      if (mode == GENERATOR_MODE_AR) { // power of two harmonics
+      if (gmode == GENERATOR_MODE_AR) { // power of two harmonics
         if (harm == kNumHarmonicsPowers) break;
         if ((harm & 3) == 0)
           tn = Interpolate1121(wav_sine1024, phase_ << harm);
         else
           tn = 2 * ((tn * tn) >> 15) - 32768;
-      } else if (mode == GENERATOR_MODE_AD) { // odd harmonics
+      } else if (gmode == GENERATOR_MODE_AD) { // odd harmonics
         tn = ((sine * tn) >> 14) - tn1;
         tn1 = t;
         t = tn;
