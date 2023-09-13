@@ -81,7 +81,7 @@ struct Warps : Module {
 			p->carrier_shape = json_integer_value(shapeJ);
 		}
 		if (json_t* modeJ = json_object_get(rootJ, "mode")) {
-		  	modulator.set_feature_mode((warps::FeatureMode)json_integer_value(modeJ));
+		  	modulator.set_feature_mode(static_cast<warps::FeatureMode>(json_integer_value(modeJ)));
 		}
 	}
 
@@ -152,10 +152,10 @@ void Warps::process(const ProcessArgs& args) {
 		modulator.Process(inputFrames, outputFrames, 60);
 	}
 
-	inputFrames[frame].l = clamp((int) (inputs[CARRIER_INPUT].getVoltage() / 16.0 * 0x8000), -0x8000, 0x7fff);
-	inputFrames[frame].r = clamp((int) (inputs[MODULATOR_INPUT].getVoltage() / 16.0 * 0x8000), -0x8000, 0x7fff);
-	outputs[MODULATOR_OUTPUT].setVoltage((float)outputFrames[frame].l / 0x8000 * 5.0);
-	outputs[AUX_OUTPUT].setVoltage((float)outputFrames[frame].r / 0x8000 * 5.0);
+	inputFrames[frame].l = clamp(static_cast<int>((inputs[CARRIER_INPUT].getVoltage() / 16.0 * 0x8000), -0x8000, 0x7fff));
+	inputFrames[frame].r = clamp(static_cast<int>((inputs[MODULATOR_INPUT].getVoltage() / 16.0 * 0x8000), -0x8000, 0x7fff));
+	outputs[MODULATOR_OUTPUT].setVoltage(static_cast<float>(outputFrames[frame].l / 0x8000 * 5.0));
+	outputs[AUX_OUTPUT].setVoltage(static_cast<float>(outputFrames[frame].r / 0x8000 * 5.0));
 }
 
 
