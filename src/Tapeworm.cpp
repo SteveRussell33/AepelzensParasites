@@ -239,7 +239,7 @@ void Tapeworm::ProcessDelay(warps::ShortFrame* input, warps::ShortFrame* output,
 				FloatFrame c = { (x1.l - xm1.l) * 0.5f,
 				                 (x1.r - xm1.r) * 0.5f
 				               };
-				FloatFrame v = { (float)(x0.l - x1.l), (float)(x0.r - x1.r)};
+				FloatFrame v = { static_cast<float>((x0.l - x1.l)), static_cast<float>((x0.r - x1.r)) };
 				FloatFrame w = { c.l + v.l, c.r + v.r };
 				FloatFrame a = { w.l + v.l + (x2.l - x0.l) * 0.5f,
 				                 w.r + v.r + (x2.r - x0.r) * 0.5f
@@ -297,7 +297,7 @@ void Tapeworm::ProcessDelay(warps::ShortFrame* input, warps::ShortFrame* output,
 			FloatFrame c = { (x1.l - xm1.l) * 0.5f,
 			                 (x1.r - xm1.r) * 0.5f
 			               };
-			FloatFrame v = { (float)(x0.l - x1.l), (float)(x0.r - x1.r)};
+			FloatFrame v = { static_cast<float>((x0.l - x1.l)), static_cast<float>((x0.r - x1.r)) };
 			FloatFrame w = { c.l + v.l, c.r + v.r };
 			FloatFrame a = { w.l + v.l + (x2.l - x0.l) * 0.5f,
 			                 w.r + v.r + (x2.r - x0.r) * 0.5f
@@ -396,10 +396,10 @@ void Tapeworm::process(const ProcessArgs& args) {
 		ProcessDelay(inputFrames, outputFrames, 60);
 	}
 
-	inputFrames[frame].l = clamp((int) (inputs[CARRIER_INPUT].getVoltage() / 16.0 * 0x8000), -0x8000, 0x7fff);
-	inputFrames[frame].r = clamp((int) (inputs[MODULATOR_INPUT].getVoltage() / 16.0 * 0x8000), -0x8000, 0x7fff);
-	outputs[MODULATOR_OUTPUT].setVoltage((float)outputFrames[frame].l / 0x8000 * 5.0);
-	outputs[AUX_OUTPUT].setVoltage((float)outputFrames[frame].r / 0x8000 * 5.0);
+	inputFrames[frame].l = clamp(static_cast<int>((inputs[CARRIER_INPUT].getVoltage() / 16.0 * 0x8000), -0x8000, 0x7fff));
+	inputFrames[frame].r = clamp(static_cast<int>((inputs[MODULATOR_INPUT].getVoltage() / 16.0 * 0x8000), -0x8000, 0x7fff));
+	outputs[MODULATOR_OUTPUT].setVoltage(static_cast<float>(outputFrames[frame].l / 0x8000 * 5.0));
+	outputs[AUX_OUTPUT].setVoltage(static_cast<float>(outputFrames[frame].r / 0x8000 * 5.0));
 }
 
 
