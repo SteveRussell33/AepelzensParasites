@@ -76,8 +76,8 @@ struct Tides : Module {
 	}
 
 	void onRandomize() override {
-		generator.set_range((tides::GeneratorRange) (random::u32() % 3));
-		generator.set_mode((tides::GeneratorMode) (random::u32() % 3));
+		generator.set_range(static_cast<tides::GeneratorRange>((random::u32() % 3)));
+		generator.set_mode(static_cast<tides::GeneratorMode>((random::u32() % 3)));
 	}
 
 	json_t* dataToJson() override {
@@ -92,13 +92,13 @@ struct Tides : Module {
 
 	void dataFromJson(json_t* rootJ) override {
 		if(json_t* featModeJ = json_object_get(rootJ, "featureMode")) {
-		    generator.feature_mode_ = (tides::Generator::FeatureMode) json_integer_value(featModeJ);
+		    generator.feature_mode_ = static_cast<tides::Generator::FeatureMode>(json_integer_value(featModeJ));
 		}
 		if (json_t* modeJ = json_object_get(rootJ, "mode")) {
-			generator.set_mode((tides::GeneratorMode) json_integer_value(modeJ));
+			generator.set_mode(static_cast<tides::GeneratorMode>(json_integer_value(modeJ)));
 		}
 		if (json_t* rangeJ = json_object_get(rootJ, "range")) {
-			generator.set_range((tides::GeneratorRange) json_integer_value(rangeJ));
+			generator.set_range(static_cast<tides::GeneratorRange>(json_integer_value(rangeJ)));
 		}
 		if (json_t* sheepJ = json_object_get(rootJ, "sheep")) {
 			sheep = json_boolean_value(sheepJ);
@@ -112,7 +112,7 @@ struct Tides : Module {
 void Tides::process(const ProcessArgs& args) {
 	tides::GeneratorMode mode = generator.mode();
 	if (modeTrigger.process(params[MODE_PARAM].getValue())) {
-		mode = (tides::GeneratorMode) (((int)mode - 1 + 3) % 3);
+		mode = static_cast<tides::GeneratorMode>((static_cast<int>(mode - 1 + 3) % 3));
 		generator.set_mode(mode);
 	}
 	lights[MODE_GREEN_LIGHT].setBrightness((mode == 2) ? 1.0 : 0.0);
@@ -120,7 +120,7 @@ void Tides::process(const ProcessArgs& args) {
 
 	tides::GeneratorRange range = generator.range();
 	if (rangeTrigger.process(params[RANGE_PARAM].getValue())) {
-		range = (tides::GeneratorRange) (((int)range - 1 + 3) % 3);
+		range = static_cast<tides::GeneratorRange>((static_cast<int>(range - 1 + 3) % 3));
 		generator.set_range(range);
 	}
 	lights[RANGE_GREEN_LIGHT].setBrightness((range == 2) ? 1.0 : 0.0);
@@ -138,7 +138,7 @@ void Tides::process(const ProcessArgs& args) {
 		    pitchParam -= 12;
 
 		//this is equivalent to bitshifting by 7bits
-		int16_t pitch = (int16_t)(pitchParam * 0x80);
+		int16_t pitch = static_cast<int16_t>(pitchParam * 0x80);
 
 		if (quantize) {
 		    uint16_t semi = pitch >> 7;
@@ -207,8 +207,8 @@ void Tides::process(const ProcessArgs& args) {
 
 	uni = uni * level >> 16;
 	bi = -bi * level >> 16;
-	float unif = (float) uni / 0xffff;
-	float bif = (float) bi / 0x8000;
+	float unif = static_cast<float>(uni / 0xffff);
+	float bif = static_cast<float>(bi / 0x8000);
 
 	outputs[HIGH_OUTPUT].setVoltage(sample.flags & tides::FLAG_END_OF_ATTACK ? 0.0 : 5.0);
 	outputs[LOW_OUTPUT].setVoltage(sample.flags & tides::FLAG_END_OF_RELEASE ? 0.0 : 5.0);
