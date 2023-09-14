@@ -97,7 +97,10 @@ struct Tapeworm : Module {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);		
 		configParam(Tapeworm::ALGORITHM_PARAM, 0.0, 8.0, 0.0, "Algorithm");
 		configParam(Tapeworm::TIMBRE_PARAM, 0.0, 1.0, 0.5, "Timbre");
-		configParam(Tapeworm::STATE_PARAM, 0.0, 1.0, 0.0, "Internal oscillator mode");
+		configButton(Tapeworm::STATE_PARAM);
+		// configSwitch(Tapeworm::STATE_PARAM, 0.0, 1.0, 0.0, "Internal oscillator mode", {
+		// 	"External", "Sine / Sawtooth", "Triangle / Pulse", "Sawtooth / LP filtered noise"
+		// });
 		configParam(Tapeworm::LEVEL1_PARAM, 0.0, 1.0, 1.0, "External oscillator amplitude / internal oscillator frequency");
 		configParam(Tapeworm::LEVEL2_PARAM, 0.0, 1.0, 1.0, "Modulator amplitude");
 		

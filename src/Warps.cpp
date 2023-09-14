@@ -57,7 +57,10 @@ struct Warps : Module {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		configParam(Warps::ALGORITHM_PARAM, 0.0, 8.0, 0.0, "Algorithm");
 		configParam(Warps::TIMBRE_PARAM, 0.0, 1.0, 0.5, "Timbre");
-		configParam(Warps::STATE_PARAM, 0.0, 1.0, 0.0, "Internal oscillator mode");
+		configButton(Warps::STATE_PARAM);
+		// configSwitch(Warps::STATE_PARAM, 0.0, 1.0, 0.0, "Internal oscillator mode", {
+		// 	"External", "Sine / Sawtooth", "Triangle / Pulse", "Sawtooth / LP filtered noise"
+		// });
 		configParam(Warps::LEVEL1_PARAM, 0.0, 1.0, 1.0, "External oscillator amplitude / internal oscillator frequency");
 		configParam(Warps::LEVEL2_PARAM, 0.0, 1.0, 1.0, "Modulator amplitude");
 
