@@ -93,8 +93,6 @@ struct Tides : Module {
 		generator.set_range(tides::GENERATOR_RANGE_MEDIUM);
 		generator.set_mode(tides::GENERATOR_MODE_LOOPING);
 		sheep = false;
-		DEBUG("GENERATOR_RANGE_MEDIUM = %d", static_cast<int>(generator.range()));
-		DEBUG("GENERATOR_MODE_LOOPING = %d", static_cast<int>(generator.mode()));
 	}
 
 	void onRandomize() override {
@@ -134,41 +132,19 @@ struct Tides : Module {
 void Tides::process(const ProcessArgs& args) {
 	tides::GeneratorMode mode = generator.mode();
 	if (modeTrigger.process(params[MODE_PARAM].getValue())) {
-		mode = static_cast<tides::GeneratorMode>((static_cast<int>(mode - 1 + 3) % 3)); /* DOESN'T MATCH HARDWARE */
+		mode = static_cast<tides::GeneratorMode>((static_cast<int>(mode + 1) % 3));
 		generator.set_mode(mode);
-
-		std::string sMode;
-		switch (mode) {
-			case tides::GENERATOR_MODE_AD:
-				sMode = "MODE_AD"; break;
-			case tides::GENERATOR_MODE_LOOPING:
-				sMode = "MODE_LOOPING"; break;
-			case tides::GENERATOR_MODE_AR:
-				sMode = "MODE_AR"; break;
-		}
-		DEBUG("Mode %d = %s", static_cast<int>(mode), sMode.c_str());
 	}
-	lights[MODE_GREEN_LIGHT].setBrightness((mode == 2) ? 1.0 : 0.0); //* Lights fixed in SP Parasites Splash *//
-	lights[MODE_RED_LIGHT].setBrightness((mode == 0) ? 1.0 : 0.0);
+	lights[MODE_GREEN_LIGHT].setBrightness((mode == 1 || mode == 2) ? 1.0 : 0.0);
+	lights[MODE_RED_LIGHT].setBrightness((mode == 0 || mode == 1) ? 1.0 : 0.0);
 
 	tides::GeneratorRange range = generator.range();
 	if (rangeTrigger.process(params[RANGE_PARAM].getValue())) {
-		range = static_cast<tides::GeneratorRange>((static_cast<int>(range - 1 + 3) % 3)); /* DOESN'T MATCH HARDWARE */
+		range = static_cast<tides::GeneratorRange>((static_cast<int>(range + 1) % 3));
 		generator.set_range(range);
-
-		std::string sRange;
-		switch (range) {
-			case tides::GENERATOR_RANGE_HIGH:
-				sRange = "RANGE_HIGH"; break;
-			case tides::GENERATOR_RANGE_MEDIUM:
-				sRange = "RANGE_MEDIUM"; break;
-			case tides::GENERATOR_RANGE_LOW:
-				sRange = "RANGE_LOW"; break;
-		}
-		DEBUG("Range %d = %s", static_cast<int>(range), sRange.c_str());
 	}
-	lights[RANGE_GREEN_LIGHT].setBrightness((range == 2) ? 1.0 : 0.0); //* Lights fixed in SP Parasites Splash *//
-	lights[RANGE_RED_LIGHT].setBrightness((range == 0) ? 1.0 : 0.0);
+	lights[RANGE_GREEN_LIGHT].setBrightness((range == 1 || range == 2) ? 1.0 : 0.0);
+	lights[RANGE_RED_LIGHT].setBrightness((range == 0 || range == 1) ? 1.0 : 0.0);
 
 	//Buffer loop
 	if (generator.writable_block()) {
