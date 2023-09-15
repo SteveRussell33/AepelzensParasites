@@ -153,11 +153,11 @@ void Tides::process(const ProcessArgs& args) {
 		float fm = clamp(inputs[FM_INPUT].getVoltage() / 5.0f * params[FM_PARAM].getValue() / 12.0f, -1.0f, 1.0f) * 0x600;
 
 		pitchParam += 60.0;
-		//this is probably not original but seems useful to keep the same frequency as in normal mode
+		// this is probably not original but seems useful to keep the same frequency as in normal mode
 		if (generator.feature_mode_ == tides::Generator::FEAT_MODE_HARMONIC)
 		    pitchParam -= 12;
 
-		//this is equivalent to bitshifting by 7bits
+		// this is equivalent to bitshifting by 7bits
 		int16_t pitch = static_cast<int16_t>(pitchParam * 0x80);
 
 		if (quantize) {
@@ -179,7 +179,7 @@ void Tides::process(const ProcessArgs& args) {
 
 		if (generator.feature_mode_ == tides::Generator::FEAT_MODE_RANDOM) {
 		    //TODO: should this be inverted?
-		    generator.set_pulse_width(clamp(1.0 - params[FM_PARAM].getValue() / 12.0, 0.0f, 2.0f) * 0x7fff);
+		    generator.set_pulse_width(clamp(1.0 - params[FM_PARAM].getValue() / 12.0f, 0.0f, 2.0f) * 0x7fff);
 		}
 
 		// Slope, smoothness, pitch

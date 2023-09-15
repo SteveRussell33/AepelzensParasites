@@ -135,13 +135,13 @@ void Warps::process(const ProcessArgs& args) {
 		p->raw_level[1] = clamp(params[LEVEL2_PARAM].getValue(), 0.0f, 1.0f);
 
 		//p->raw_algorithm_pot = clampf(params[ALGORITHM_PARAM].getValue() /8.0, 0.0, 1.0);
-		float val = clamp(params[ALGORITHM_PARAM].getValue() /8.0f, 0.0f, 1.0f);
+		float val = clamp(params[ALGORITHM_PARAM].getValue() / 8.0f, 0.0f, 1.0f);
 		val = stmlib::Interpolate(warps::lut_pot_curve, val, 512.0f);
 		p->raw_algorithm_pot = val;
 
-		p->raw_algorithm_cv = clamp(inputs[ALGORITHM_INPUT].getVoltage() /5.0f, -1.0f,1.0f);
+		p->raw_algorithm_cv = clamp(inputs[ALGORITHM_INPUT].getVoltage() / 5.0f, -1.0f, 1.0f);
 		//According to the cv-scaler this does not seem to use the plot curve
-		p->raw_algorithm = clamp(params[ALGORITHM_PARAM].getValue() /8.0f + inputs[ALGORITHM_INPUT].getVoltage() /5.0f, 0.0f, 1.0f);
+		p->raw_algorithm = clamp(params[ALGORITHM_PARAM].getValue() / 8.0f + inputs[ALGORITHM_INPUT].getVoltage() /5.0f, 0.0f, 1.0f);
 		{
 			// Taken from eurorack\warps\ui.cc
 			float zone = 8.0f * p->modulation_algorithm;

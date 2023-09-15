@@ -135,16 +135,11 @@ struct Tapeworm : Module {
 		}
 	}
 
-	void onReset() override {
-		parameters_.carrier_shape = 0;
-	}
-
-	void onRandomize() override {
-		parameters_.carrier_shape = random::u32() % 4;
-	}
+	void onReset() override { parameters_.carrier_shape = 0; }
+	void onRandomize() override { parameters_.carrier_shape = random::u32() % 4; }
 };
 
-//Delay Code from parasites firmware
+// Delay Code from Parasites firmware
 void Tapeworm::ProcessDelay(warps::ShortFrame* input, warps::ShortFrame* output, size_t size) {
 
 	using namespace warps;
