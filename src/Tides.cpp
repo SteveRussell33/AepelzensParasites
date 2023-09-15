@@ -283,64 +283,45 @@ struct TidesWidget : ModuleWidget {
 		addChild(createLight<MediumLight<GreenRedLight>>(Vec(57, 102), module, Tides::RANGE_GREEN_LIGHT));
 	}
 
-	struct TidesSheepItem : MenuItem {
-		Tides *tides;
-		void onAction(const event::Action &e) override {
-			tides->sheep ^= true;
-		}
-		void step() override {
-			rightText = (tides->sheep) ? "✔" : "";
-			MenuItem::step();
-		}
-	};
-
-	struct TidesModeItem : MenuItem {
-		Tides *module;
-		tides::Generator::FeatureMode mode;
-	    void onAction(const event::Action &e) override {
-		    module->generator.feature_mode_ = mode;
-		}
-		void step() override {
-		  rightText = (module->generator.feature_mode_ == mode) ? "✔" : "";
-			MenuItem::step();
-		}
-	};
-
-	struct TidesQuantizerItem : MenuItem {
-		Tides *module;
-		uint8_t quantize_;
-	    void onAction(const event::Action &e) override {
-		    module->quantize = quantize_;
-		}
-		void step() override {
-		  rightText = (module->quantize == quantize_) ? "✔" : "";
-		  MenuItem::step();
-		}
-	};
-
 	void appendContextMenu(Menu* menu) override {
-		Tides *tides = dynamic_cast<Tides*>(this->module);
-		assert(tides);
+		Tides* module = dynamic_cast<Tides*>(this->module);
+		assert(module);
 
-	#ifdef WAVETABLE_HACK
+#ifdef WAVETABLE_HACK
 		menu->addChild(new MenuSeparator);
-		menu->addChild(construct<TidesSheepItem>(&MenuEntry::text, "Sheep", &TidesSheepItem::tides, tides));
-	#endif
+		menu->addChild(createBoolPtrMenuItem("Sheep", "", &module->sheep));
+#endif
 		menu->addChild(new MenuSeparator);
-		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Mode"));
-		menu->addChild(construct<TidesModeItem>(&TidesModeItem::text, "Original", &TidesModeItem::module, tides, &TidesModeItem::mode, tides::Generator::FEAT_MODE_FUNCTION));
-		menu->addChild(construct<TidesModeItem>(&TidesModeItem::text, "Harmonic", &TidesModeItem::module, tides, &TidesModeItem::mode, tides::Generator::FEAT_MODE_HARMONIC));
-		menu->addChild(construct<TidesModeItem>(&TidesModeItem::text, "Random", &TidesModeItem::module, tides, &TidesModeItem::mode, tides::Generator::FEAT_MODE_RANDOM));
+		menu->addChild(createMenuLabel("Mode"));
 
-		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Quantizer"));
-		menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "Off", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 0));
-		menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "Semitones", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 1));
-		menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "Ionian", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 2));
-		menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "Aeolian", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 3));
-		menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "Whole tones", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 4));
-		menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "Pentatonic Minor", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 5));
-		menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "Pent-3", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 6));
-		menu->addChild(construct<TidesQuantizerItem>(&TidesQuantizerItem::text, "Fifths", &TidesQuantizerItem::module, tides, &TidesQuantizerItem::quantize_, 7));
+		struct ModeNameAndId {
+			std::string name;
+			tides::Generator::FeatureMode fmode;
+		};
+		static const std::vector<ModeNameAndId> modeLabels = {
+			{"Original", tides::Generator::FEAT_MODE_FUNCTION},
+			{"Harmonic", tides::Generator::FEAT_MODE_HARMONIC},
+			{"Random",	 tides::Generator::FEAT_MODE_RANDOM}
+		};
+		for (auto modeLabel : modeLabels) {
+			menu->addChild(createCheckMenuItem(modeLabel.name, "",
+				[=]() {return module->generator.feature_mode_ == modeLabel.fmode;},
+				[=]() {module->generator.feature_mode_ = modeLabel.fmode;}
+			));
+		}
+
+		menu->addChild(new MenuSeparator);
+		menu->addChild(createMenuLabel("Quantizer"));
+
+		static const std::vector<std::string> quantizeLabels = {
+			"Off", "Semitones", "Ionian", "Aeolian", "Whole tones", "Pentatonic Minor", "Pent-3", "Fifths"
+		};
+		for (size_t i = 0; i < quantizeLabels.size(); i++) {
+			menu->addChild(createCheckMenuItem(quantizeLabels[i], "",
+				[=]() {return module->quantize == i;},
+				[=]() {module->quantize = i;}
+			));
+		}
 	}
 };
 
