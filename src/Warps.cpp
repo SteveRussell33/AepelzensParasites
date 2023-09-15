@@ -204,37 +204,34 @@ struct WarpsWidget : ModuleWidget {
 		addChild(createLightCentered<Rogan6PSLight<RedGreenBlueLight>>(Vec(73.556641, 96.560532), module, Warps::ALGORITHM_LIGHT));
 	}
 
-	struct WarpsModeItem : MenuItem {
-		Warps* module;
-		warps::FeatureMode mode;
-		void onAction(const event::Action &e) override {
-			//module->playback = playback;
-			module->modulator.set_feature_mode(mode);
-		}
-		void step() override {
-			rightText = (module->modulator.feature_mode() == mode) ? "✔" : "";
-			MenuItem::step();
-		}
-	};
-
 	void appendContextMenu(Menu* menu) override {
 		Warps* module = dynamic_cast<Warps*>(this->module);
 		assert(module);
 
 		menu->addChild(new MenuSeparator);
-		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Mode"));
-
-		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Meta (main function)", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_META));
-		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Wavefolder", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_FOLD));
-		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Chebyschev (waveshaper)", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_CHEBYSCHEV));
-		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Frequency Shifter (easter egg)", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_FREQUENCY_SHIFTER));
-		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Dual Bitcrusher", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_BITCRUSHER));
-		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Comparator + Chebyschev", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_COMPARATOR));
-		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Vocoder", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_VOCODER));
-	// #ifdef DOPPLER_PANNER
-		menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Binaural Doppler [1 instance] ", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_DOPPLER));
-	// #endif
-		//menu->addChild(construct<WarpsModeItem>(&WarpsModeItem::text, "Delay", &WarpsModeItem::module, module, &WarpsModeItem::mode, warps::FEATURE_MODE_DELAY));
+		menu->addChild(createMenuLabel("Mode"));
+		
+		// Nice way to do this - credit @hemmer
+		struct ModeNameAndId {
+			std::string name;
+			warps::FeatureMode fmode;
+		};
+		static const std::vector<ModeNameAndId> modeLabels = {
+			{"Meta (main function)", 			warps::FEATURE_MODE_META},
+			{"Wavefolder", 						warps::FEATURE_MODE_FOLD},
+			{"Chebyschev (waveshaper)", 		warps::FEATURE_MODE_CHEBYSCHEV},
+			{"Frequency Shifter (easter egg)", 	warps::FEATURE_MODE_FREQUENCY_SHIFTER},
+			{"Dual Bitcrusher", 				warps::FEATURE_MODE_BITCRUSHER},
+			{"Comparator + Chebyschev", 		warps::FEATURE_MODE_COMPARATOR},
+			{"Vocoder", 						warps::FEATURE_MODE_VOCODER},
+			{"Binaural Doppler [1 instance]", 	warps::FEATURE_MODE_DOPPLER}
+		};
+		for (auto modeLabel : modeLabels) {
+			menu->addChild(createCheckMenuItem(modeLabel.name, "",
+				[=]() {return module->modulator.feature_mode() == modeLabel.fmode;},
+				[=]() {module->modulator.set_feature_mode(modeLabel.fmode);}
+			));
+		}
 	}
 };
 
