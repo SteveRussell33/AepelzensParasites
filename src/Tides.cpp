@@ -67,7 +67,7 @@ struct Tides : Module {
 		configParam(Tides::SHAPE_PARAM, -1.0, 1.0, 0.0, "Shape");
 		configParam(Tides::SLOPE_PARAM, -1.0, 1.0, 0.0, "Slope");
 		configParam(Tides::SMOOTHNESS_PARAM, -1.0, 1.0, 0.0, "Smoothness");
-		// configParam(Tides::Q_PARAM, 0.0, 7.0, 0.0, "Quantizer mode")->snapEnabled = true;
+		// configParam(Tides::Q_PARAM, 0.0, 7.0, 0.0, "Quantizer scale")->snapEnabled = true;
 		
 		configInput(SHAPE_INPUT, "Shape");
 		configInput(SLOPE_INPUT, "Slope");
@@ -312,9 +312,9 @@ struct TidesWidget : ModuleWidget {
 			tides::Generator::FeatureMode fmode;
 		};
 		static const std::vector<ModeNameAndId> modeLabels = {
-			{"Original", tides::Generator::FEAT_MODE_FUNCTION},
-			{"Harmonic", tides::Generator::FEAT_MODE_HARMONIC},
-			{"Random",	 tides::Generator::FEAT_MODE_RANDOM}
+			{"Original function generator", 	tides::Generator::FEAT_MODE_FUNCTION},
+			{"Two Bumps - Harmonic osc", tides::Generator::FEAT_MODE_HARMONIC},
+			{"Two Drunks - Random walk", 	tides::Generator::FEAT_MODE_RANDOM}
 		};
 		for (auto modeLabel : modeLabels) {
 			menu->addChild(createCheckMenuItem(modeLabel.name, "",
