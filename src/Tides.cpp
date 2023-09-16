@@ -42,6 +42,7 @@ struct Tides : Module {
 		MODE_GREEN_LIGHT, MODE_RED_LIGHT,
 		PHASE_GREEN_LIGHT, PHASE_RED_LIGHT,
 		RANGE_GREEN_LIGHT, RANGE_RED_LIGHT,
+		ENUMS(Q_LIGHTS, 3),
 		NUM_LIGHTS
 	};
 
@@ -281,6 +282,9 @@ struct TidesWidget : ModuleWidget {
 		addChild(createLight<MediumLight<GreenRedLight>>(Vec(57, 61), module, Tides::MODE_GREEN_LIGHT));
 		addChild(createLight<MediumLight<GreenRedLight>>(Vec(57, 82), module, Tides::PHASE_GREEN_LIGHT));
 		addChild(createLight<MediumLight<GreenRedLight>>(Vec(57, 102), module, Tides::RANGE_GREEN_LIGHT));
+		for (size_t i = 0; i < 3; i++) {
+			addChild(createLight<SmallLight<GreenLight>>(Vec(150 + (i * 7), 40), module, Tides::Q_LIGHTS + i));
+		}
 	}
 
 	void appendContextMenu(Menu* menu) override {
