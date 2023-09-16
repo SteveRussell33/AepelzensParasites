@@ -166,6 +166,11 @@ void Tides::process(const ProcessArgs& args) {
 		    uint16_t octaves = semi / 12 ;
 		    semi -= octaves * 12;
 		    pitch = octaves * kOctave + tides::quantize_lut[quantize - 1][semi];
+			lights[Q_LIGHTS + 0].setBrightness((quantize == 1 || quantize == 3 || quantize == 5 || quantize == 7) ? 1.0 : 0.0);
+			lights[Q_LIGHTS + 1].setBrightness((quantize == 2 || quantize == 3 || quantize == 6 || quantize == 7) ? 1.0 : 0.0);
+			lights[Q_LIGHTS + 2].setBrightness((quantize == 4 || quantize == 5 || quantize == 6 || quantize == 7) ? 1.0 : 0.0);
+		} else {
+			for (size_t i = 0; i < 3; i++) lights[Q_LIGHTS + i].setBrightness(0.0);
 		}
 
 		// Scale to the global sample rate
