@@ -47,7 +47,6 @@ struct Tides : Module {
 		NUM_LIGHTS
 	};
 
-	const int16_t kOctave = 12 * 128;
 	bool sheep;
 	tides::Generator generator;
 	uint8_t quantize = 0;
@@ -172,8 +171,7 @@ void Tides::process(const ProcessArgs& args) {
 		    uint16_t semi = pitch >> 7;
 		    uint16_t octaves = semi / 12 ;
 		    semi -= octaves * 12;
-		    // pitch = octaves * tides::kOctave + tides::quantize_lut[quantize - 1][semi];
-		    pitch = octaves * kOctave + tides::quantize_lut[quantize - 1][semi];
+		    pitch = octaves * tides::kOctave + tides::quantize_lut[quantize - 1][semi];
 		    // from ui.cc
 			lights[Q_LIGHTS + 0].setBrightness((quantize & 1) ? 1.0 : 0.0);
 			lights[Q_LIGHTS + 1].setBrightness((quantize & 2) ? 1.0 : 0.0);
