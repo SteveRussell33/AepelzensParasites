@@ -67,7 +67,9 @@ struct Tides : Module {
 		configParam(Tides::SHAPE_PARAM, -1.0, 1.0, 0.0, "Shape");
 		configParam(Tides::SLOPE_PARAM, -1.0, 1.0, 0.0, "Slope");
 		configParam(Tides::SMOOTHNESS_PARAM, -1.0, 1.0, 0.0, "Smoothness");
-		configParam(Tides::Q_PARAM, 0.0, 7.0, 0.0, "Quantizer scale")->snapEnabled = true;
+		configSwitch(Tides::Q_PARAM, 0.0, 7.0, 0.0, "Quantizer scale", {
+			"Off", "Semitones", "Ionian", "Aeolian", "Whole tones", "Pentatonic Minor", "Pent-3", "Fifths"
+		})->snapEnabled = true;
 		
 		configInput(SHAPE_INPUT, "Shape");
 		configInput(SLOPE_INPUT, "Slope");
@@ -206,6 +208,7 @@ void Tides::process(const ProcessArgs& args) {
 		// Sync
 		// Slight deviation from spec here.
 		// Instead of toggling sync by holding the range button, just enable it if the clock port is plugged in.
+		// TODO make auto PLL (as it is now) an option? 
 		generator.set_sync(inputs[CLOCK_INPUT].isConnected());
 		generator.FillBuffer();
 #ifdef WAVETABLE_HACK
@@ -327,18 +330,18 @@ struct TidesWidget : ModuleWidget {
 			));
 		}
 
-		menu->addChild(new MenuSeparator);
-		menu->addChild(createMenuLabel("Quantizer"));
+		// menu->addChild(new MenuSeparator);
+		// menu->addChild(createMenuLabel("Quantizer"));
 
-		static const std::vector<std::string> quantizeLabels = {
-			"Off", "Semitones", "Ionian", "Aeolian", "Whole tones", "Pentatonic Minor", "Pent-3", "Fifths"
-		};
-		for (size_t i = 0; i < quantizeLabels.size(); i++) {
-			menu->addChild(createCheckMenuItem(quantizeLabels[i], "",
-				[=]() {return module->quantize == i;},
-				[=]() {module->quantize = i;}
-			));
-		}
+		// static const std::vector<std::string> quantizeLabels = {
+		// 	"Off", "Semitones", "Ionian", "Aeolian", "Whole tones", "Pentatonic Minor", "Pent-3", "Fifths"
+		// };
+		// for (size_t i = 0; i < quantizeLabels.size(); i++) {
+		// 	menu->addChild(createCheckMenuItem(quantizeLabels[i], "",
+		// 		[=]() {return module->quantize == i;},
+		// 		[=]() {module->quantize = i;}
+		// 	));
+		// }
 	}
 };
 
