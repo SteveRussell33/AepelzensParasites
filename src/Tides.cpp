@@ -15,7 +15,7 @@ struct Tides : Module {
 		SHAPE_PARAM,
 		SLOPE_PARAM,
 		SMOOTHNESS_PARAM,
-		/*Q_PARAM,*/
+		Q_PARAM,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -67,7 +67,7 @@ struct Tides : Module {
 		configParam(Tides::SHAPE_PARAM, -1.0, 1.0, 0.0, "Shape");
 		configParam(Tides::SLOPE_PARAM, -1.0, 1.0, 0.0, "Slope");
 		configParam(Tides::SMOOTHNESS_PARAM, -1.0, 1.0, 0.0, "Smoothness");
-		// configParam(Tides::Q_PARAM, 0.0, 7.0, 0.0, "Quantizer scale")->snapEnabled = true;
+		configParam(Tides::Q_PARAM, 0.0, 7.0, 0.0, "Quantizer scale")->snapEnabled = true;
 		
 		configInput(SHAPE_INPUT, "Shape");
 		configInput(SLOPE_INPUT, "Slope");
@@ -163,16 +163,20 @@ void Tides::process(const ProcessArgs& args) {
 		// this is equivalent to bitshifting by 7bits
 		int16_t pitch = static_cast<int16_t>(pitchParam * 0x80);
 
-		// if ((quantize = params[Q_PARAM].getValue())) {
-		if (quantize) {
+		// Deviate from spec here: use trimpot and/or menu
+		// to select scale instead of Mode & Range buttons 
+		if ((quantize = params[Q_PARAM].getValue())) {
+		// if (quantize) {
 		    uint16_t semi = pitch >> 7;
 		    uint16_t octaves = semi / 12 ;
 		    semi -= octaves * 12;
+		    // pitch = octaves * tides::kOctave + tides::quantize_lut[quantize - 1][semi];
 		    pitch = octaves * kOctave + tides::quantize_lut[quantize - 1][semi];
-			lights[Q_LIGHTS + 0].setBrightness((quantize == 1 || quantize == 3 || quantize == 5 || quantize == 7) ? 1.0 : 0.0);
-			lights[Q_LIGHTS + 1].setBrightness((quantize == 2 || quantize == 3 || quantize == 6 || quantize == 7) ? 1.0 : 0.0);
-			lights[Q_LIGHTS + 2].setBrightness((quantize == 4 || quantize == 5 || quantize == 6 || quantize == 7) ? 1.0 : 0.0);
-		} else {
+		    // from ui.cc
+			lights[Q_LIGHTS + 0].setBrightness((quantize & 1) ? 1.0 : 0.0);
+			lights[Q_LIGHTS + 1].setBrightness((quantize & 2) ? 1.0 : 0.0);
+			lights[Q_LIGHTS + 2].setBrightness((quantize & 4) ? 1.0 : 0.0);
+		} else { // quantize is off
 			for (size_t i = 0; i < 3; i++) lights[Q_LIGHTS + i].setBrightness(0.0);
 		}
 
@@ -270,7 +274,7 @@ struct TidesWidget : ModuleWidget {
 		addParam(createParam<Rogan1PSWhite>(Vec(13, 155), module, Tides::SHAPE_PARAM));
 		addParam(createParam<Rogan1PSWhite>(Vec(85, 155), module, Tides::SLOPE_PARAM));
 		addParam(createParam<Rogan1PSWhite>(Vec(156, 155), module, Tides::SMOOTHNESS_PARAM));
-		// addParam(createParam<Trimpot>(Vec(172, 35), module, Tides::Q_PARAM));
+		addParam(createParam<Trimpot>(Vec(172, 35), module, Tides::Q_PARAM));
 
 		addInput(createInput<PJ301MPort>(Vec(21, 219), module, Tides::SHAPE_INPUT));
 		addInput(createInput<PJ301MPort>(Vec(93, 219), module, Tides::SLOPE_INPUT));
@@ -312,8 +316,8 @@ struct TidesWidget : ModuleWidget {
 			tides::Generator::FeatureMode fmode;
 		};
 		static const std::vector<ModeNameAndId> modeLabels = {
-			{"Original function generator", 	tides::Generator::FEAT_MODE_FUNCTION},
-			{"Two Bumps - Harmonic osc", tides::Generator::FEAT_MODE_HARMONIC},
+			{"Original function generator", tides::Generator::FEAT_MODE_FUNCTION},
+			{"Two Bumps - Harmonic osc", 	tides::Generator::FEAT_MODE_HARMONIC},
 			{"Two Drunks - Random walk", 	tides::Generator::FEAT_MODE_RANDOM}
 		};
 		for (auto modeLabel : modeLabels) {
