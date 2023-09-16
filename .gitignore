@@ -3,3 +3,4 @@
 /plugin.dylib
 /plugin.dll
 /plugin.so
+*.bat
