@@ -244,8 +244,8 @@ void Tides::process(const ProcessArgs& args) {
 	float unif = static_cast<float>(uni) / 0xffff;
 	float bif = static_cast<float>(bi) / 0x8000;
 
-	outputs[HIGH_OUTPUT].setVoltage(sample.flags & tides::FLAG_END_OF_ATTACK ? 0.0 : 5.0);
-	outputs[LOW_OUTPUT].setVoltage(sample.flags & tides::FLAG_END_OF_RELEASE ? 0.0 : 5.0);
+	outputs[HIGH_OUTPUT].setVoltage((sample.flags & tides::FLAG_END_OF_ATTACK) ? 0.0 : 5.0);
+	outputs[LOW_OUTPUT].setVoltage((sample.flags & tides::FLAG_END_OF_RELEASE) ? 0.0 : 5.0);
 	outputs[UNI_OUTPUT].setVoltage(unif * 8.0);
 	outputs[BI_OUTPUT].setVoltage(bif * 5.0);
 
