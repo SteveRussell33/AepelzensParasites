@@ -217,14 +217,14 @@ struct WarpsWidget : ModuleWidget {
 			warps::FeatureMode fmode;
 		};
 		static const std::vector<ModeNameAndId> modeLabels = {
-			{"Meta (main function)", 			warps::FEATURE_MODE_META},
+			{"Binaural Doppler [1 instance]", 	warps::FEATURE_MODE_DOPPLER},
 			{"Wavefolder", 						warps::FEATURE_MODE_FOLD},
 			{"Chebyschev (waveshaper)", 		warps::FEATURE_MODE_CHEBYSCHEV},
 			{"Frequency Shifter (easter egg)", 	warps::FEATURE_MODE_FREQUENCY_SHIFTER},
 			{"Dual Bitcrusher", 				warps::FEATURE_MODE_BITCRUSHER},
 			{"Comparator + Chebyschev", 		warps::FEATURE_MODE_COMPARATOR},
 			{"Vocoder", 						warps::FEATURE_MODE_VOCODER},
-			{"Binaural Doppler [1 instance]", 	warps::FEATURE_MODE_DOPPLER}
+			{"Meta (main function)", 			warps::FEATURE_MODE_META}
 		};
 		for (auto modeLabel : modeLabels) {
 			menu->addChild(createCheckMenuItem(modeLabel.name, "",
