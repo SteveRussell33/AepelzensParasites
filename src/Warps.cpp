@@ -226,7 +226,7 @@ struct WarpsWidget : ModuleWidget {
 			{"Vocoder", 						warps::FEATURE_MODE_VOCODER},
 			{"Meta (main function)", 			warps::FEATURE_MODE_META}
 		};
-		for (auto modeLabel : modeLabels) {
+		for (const auto &modeLabel : modeLabels) {
 			menu->addChild(createCheckMenuItem(modeLabel.name, "",
 				[=]() {return module->modulator.feature_mode() == modeLabel.fmode;},
 				[=]() {module->modulator.set_feature_mode(modeLabel.fmode);}

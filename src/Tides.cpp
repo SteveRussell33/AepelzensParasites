@@ -321,7 +321,7 @@ struct TidesWidget : ModuleWidget {
 			{"Two Bumps - Harmonic osc", 	tides::Generator::FEAT_MODE_HARMONIC},
 			{"Two Drunks - Random walk", 	tides::Generator::FEAT_MODE_RANDOM}
 		};
-		for (auto modeLabel : modeLabels) {
+		for (const auto &modeLabel : modeLabels) {
 			menu->addChild(createCheckMenuItem(modeLabel.name, "",
 				[=]() {return module->generator.feature_mode_ == modeLabel.fmode;},
 				[=]() {module->generator.feature_mode_ = modeLabel.fmode;}
