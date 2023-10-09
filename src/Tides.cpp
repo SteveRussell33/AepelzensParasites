@@ -164,8 +164,8 @@ void Tides::process(const ProcessArgs& args) {
 		// this is equivalent to bitshifting by 7bits
 		int16_t pitch = static_cast<int16_t>(pitchParam * 0x80);
 
-		// Deviate from spec here: use trimpot and/or menu
-		// to select scale instead of Mode & Range buttons 
+		// Deviate from spec here: use trimpot to
+		// select scale instead of Mode & Range buttons 
 		if ((quantize = params[Q_PARAM].getValue())) {
 		// if (quantize) {
 		    uint16_t semi = pitch >> 7;
@@ -327,19 +327,6 @@ struct TidesWidget : ModuleWidget {
 				[=]() {module->generator.feature_mode_ = modeLabel.fmode;}
 			));
 		}
-
-		// menu->addChild(new MenuSeparator);
-		// menu->addChild(createMenuLabel("Quantizer"));
-
-		// static const std::vector<std::string> quantizeLabels = {
-		// 	"Off", "Semitones", "Ionian", "Aeolian", "Whole tones", "Pentatonic Minor", "Pent-3", "Fifths"
-		// };
-		// for (size_t i = 0; i < quantizeLabels.size(); i++) {
-		// 	menu->addChild(createCheckMenuItem(quantizeLabels[i], "",
-		// 		[=]() {return module->quantize == i;},
-		// 		[=]() {module->quantize = i;}
-		// 	));
-		// }
 	}
 };
 
