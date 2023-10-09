@@ -199,7 +199,7 @@ class Generator {
   void FillBufferAudioRate();
   void FillBufferControlRate();
   void FillBufferWavetable();
-  template<GeneratorMode mode> void FillBufferHarmonic();
+  template<GeneratorMode gmode> void FillBufferHarmonic();
   void FillBufferRandom();
   int32_t ComputeAntialiasAttenuation(
         int16_t pitch,
