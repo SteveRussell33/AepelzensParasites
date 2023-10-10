@@ -48,7 +48,7 @@ struct Tapeworm : Module {
 	warps::FloatFrame feedback_sample;
 	int32_t write_head = 0;
 	float write_position = 0.0f;
-	warps::FloatFrame previous_samples[3] = {{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}};
+	warps::FloatFrame previous_samples[3] {};
 
 	float lp_time = 0.0f;
 	float lp_rate;
