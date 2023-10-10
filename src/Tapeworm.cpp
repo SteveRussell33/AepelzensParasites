@@ -40,9 +40,6 @@ struct Tapeworm : Module {
 	dsp::SchmittTrigger stateTrigger;
 
 	//Parasites variables
-	static const size_t kMaxBlockSize = 96;
-	static const size_t kOversampling = 6;
-	//static const size_t kLessOversampling = 4;
 	stmlib::OnePole filter_[4];
 
 	warps::Parameters parameters_;
@@ -58,9 +55,9 @@ struct Tapeworm : Module {
 
 	/* everything that follows will be used as delay buffer */
 	warps::ShortFrame delay_buffer_[8192 + 4096];
-	float internal_modulation_[kMaxBlockSize];
-	float buffer_[3][kMaxBlockSize];
-	float src_buffer_[2][kMaxBlockSize * kOversampling];
+	float internal_modulation_[warps::kMaxBlockSize];
+	float buffer_[3][warps::kMaxBlockSize];
+	float src_buffer_[2][warps::kMaxBlockSize * warps::kOversampling];
 	float feedback_sample_;
 
 	enum DelaySize {
