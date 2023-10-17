@@ -1,8 +1,6 @@
 #include "AepelzensParasites.hpp"
 #include "stmlib/utils/random.h"
 #include "warps/dsp/modulator.h"
-#include "warps/resources.h"
-#include "warps/dsp/parameters.h"
 
 struct Tapeworm : Module {
 	enum ParamIds {
