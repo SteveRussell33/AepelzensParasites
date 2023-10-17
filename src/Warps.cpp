@@ -1,6 +1,5 @@
 #include "AepelzensParasites.hpp"
 #include "warps/dsp/modulator.h"
-#include "warps/resources.h"
 
 #pragma GCC diagnostic ignored "-Wclass-memaccess"
 
